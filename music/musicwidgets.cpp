@@ -136,7 +136,7 @@ void MusicWidgets::slot_onMediaStatusChanged(QMediaPlayer::MediaStatus status)
 void MusicWidgets::setOriginState()
 {
     m_bottomwid->setOriginState();
-    m_middlewid->getListWidget()->tableUnfocus();
+    m_middlewid->getListWidget()->setOriginState();
     m_middlewid->getLyricWidget()->setOriginState();
 }
 
@@ -153,11 +153,7 @@ void MusicWidgets::slot_onMetaDataAvailableChanged(bool available)
 {
     if(available){
         QString mediaName = m_player->metaData(QMediaMetaData::Title).toString();
-        if(mediaName!=NULL && mediaName !=""){
-            m_middlewid->getLyricWidget()->setSongText(mediaName);
-        }else{
-            m_middlewid->getLyricWidget()->setSongText(m_player->currentMedia().canonicalUrl().fileName());
-        }
+        m_middlewid->getLyricWidget()->currentMediaChanged(mediaName,m_player->currentMedia());
         m_middlewid->getListWidget()->setPlayingMediaContent(m_player->currentMedia());
     }
 }
@@ -165,6 +161,7 @@ void MusicWidgets::slot_onMetaDataAvailableChanged(bool available)
 void MusicWidgets::slot_onPositonChanged(qint64 position)
 {
     m_bottomwid->onPlayerPositionChanged(position,m_player->duration());
+    m_middlewid->getLyricWidget()->onCurrentPositionChanged(position);
 }
 
 void MusicWidgets::slot_onDuratuonChanged(qint64 duration)

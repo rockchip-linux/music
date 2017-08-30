@@ -82,8 +82,13 @@ void MusicListWidget::setPlayingMediaContent(QMediaContent content)
         }
     }
     if(index!=-1){
-        m_table->setCurrentCell(index,0);
+        m_table->playingItemChanged(index);
     }
+}
+
+void MusicListWidget::setOriginState()
+{
+    m_table->setOriginState();
 }
 
 void MusicListWidget::deleteItem(int row)

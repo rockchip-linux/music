@@ -11,6 +11,7 @@ int move_distance_next_step = 100;
 #endif
 
 MusicListTable::MusicListTable(QWidget *parent):BaseTableWidget(parent,move_distance_next_step)
+  ,playingItemIndex(-1)
 {    
     init();
     initConnection();
@@ -51,6 +52,25 @@ void MusicListTable::insertIntoTable(QString item1Text, QString item2Text)
 
     item(rowcount,2)->setTextAlignment(Qt::AlignVCenter|Qt::AlignLeft);
     item(rowcount,3)->setTextAlignment(Qt::AlignVCenter|Qt::AlignRight);
+}
+
+void MusicListTable::playingItemChanged(int index)
+{
+    if(playingItemIndex != -1){
+        item(playingItemIndex,3)->setText(playingItemSuffix);
+    }
+    if(index != -1){
+        playingItemIndex = index;
+        playingItemSuffix = item(index,3)->text();
+        setCurrentCell(index,0);
+        item(index,3)->setText("★★");
+    }
+}
+
+void MusicListTable::setOriginState()
+{
+    setCurrentCell(-1,-1);
+    playingItemChanged(-1);
 }
 
 void MusicListTable::clearTable()

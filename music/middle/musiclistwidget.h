@@ -37,7 +37,7 @@ public:
     /* Update table by search result. */
     void updateLocalList(QFileInfoList fileList);
     MediaList* getMediaList(){return m_playlist;}
-    void tableUnfocus(){m_table->setCurrentCell(-1,-1);}
+    void setOriginState();
     void setPlayingMediaContent(QMediaContent);
     void deleteItem(int row);
 private:
