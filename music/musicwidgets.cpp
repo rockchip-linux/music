@@ -290,6 +290,7 @@ void MusicWidgets::savaSetting()
 void MusicWidgets::slot_exit()
 {
     savaSetting();
+    mainWindow->stopUeventLoop();
     mainWindow->close();
 }
 
