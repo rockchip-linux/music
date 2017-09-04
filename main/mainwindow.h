@@ -5,6 +5,8 @@
 
 #include "musicwidgets.h"
 #include "base/basewindow.h"
+#include "ueventthread.h"
+#include "inotifythread.h"
 
 /**
  * The main window of application.
@@ -20,14 +22,22 @@ public:
     ~MainWindow();
 
     MusicWidgets* getMusicWidget(){return m_musicWid;}
+    void onApplicationClose();
 private:
     MusicWidgets *m_musicWid;
     bool mediaHasUpdate;
+    // Thread for media resource update.
+    UeventThread *ueventThread;
+    InotifyThread *inotifyThread;
 
+    void initData();
     void initLayout();
     void initConnection();
 protected:
     void keyPressEvent(QKeyEvent *event);
+    // Used for disable or enable application when car-reverse event comes.
+    void disableApplication();
+    void enableApplication();
 public slots:
     void slot_setUpdateFlag();
     void slot_updateMedia();

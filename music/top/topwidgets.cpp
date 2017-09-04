@@ -21,7 +21,7 @@ void TopWidgets::initLayout()
     lyout1->addStretch(0);
     lyout1->setContentsMargins(0,0,0,0);
 
-    QLabel *titleLabel=new QLabel("musicPlayer",this);
+    QLabel *titleLabel=new QLabel("music player",this);
     QFont font = titleLabel->font();
     font.setPixelSize(font_size_big);
     titleLabel->setFont(font);

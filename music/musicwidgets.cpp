@@ -290,8 +290,7 @@ void MusicWidgets::savaSetting()
 void MusicWidgets::slot_exit()
 {
     savaSetting();
-    mainWindow->stopUeventLoop();
-    mainWindow->close();
+    mainWindow->onApplicationClose();
 }
 
 QFileInfoList MusicWidgets::findMusicFiles(const QString& path)
