@@ -100,7 +100,7 @@ void BottomWidgets::initLayout()
     mainLayout->addSpacing(0);
     mainLayout->addWidget(m_progressSlider);
     mainLayout->addLayout(controlLayout);
-    mainLayout->setContentsMargins(0,0,0,0);
+    mainLayout->setContentsMargins(15,15,15,0);
     mainLayout->setSpacing(0);
 
     setLayout(mainLayout);
