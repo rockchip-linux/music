@@ -110,6 +110,7 @@ void MusicWidgets::initPlayerAndConnection()
 void MusicWidgets::slot_volumeChanged(int value)
 {
     m_player->setVolume(value);
+    saveVolume(value);
 }
 
 void MusicWidgets::slot_onErrorOn(QMediaPlayer::Error)
@@ -330,8 +331,25 @@ void MusicWidgets::updateVolume(bool volumeAdd)
         }
     }
     m_bottomwid->updateVolumeSliderValue(m_player->volume());
+    saveVolume(m_player->volume());
 }
+void MusicWidgets::saveVolume(int volume){
 
+    QDir  settingsDir("/data/");
+    QFile *volumeFile;
+    if(settingsDir.exists()){
+        volumeFile = new QFile("/data/volumn");
+    }else{
+        volumeFile = new QFile("/etc/volumn");
+    }
+
+    if (volumeFile->open(QFile::WriteOnly | QIODevice::Truncate)) {
+        QTextStream out(volumeFile);
+        out <<volume;
+        volumeFile->close();
+     }
+    delete volumeFile;
+}
 MusicWidgets::~MusicWidgets()
 {
 }

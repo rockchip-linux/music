@@ -41,6 +41,7 @@ private:
     void readSetting();
     void setOriginState();
     void savaSetting();
+    void saveVolume(int volume);
 private slots: 
     void slot_volumeChanged(int);
     void slot_nextSong();
