@@ -24,17 +24,17 @@ public:
     void clearList();
     void setPlayMode(PlayMode);
     int getPlayMode(){return m_playmode;}
-    inline void addPlayList(const QString& path){m_list.append(QUrl::fromLocalFile(path));}
-    QUrl getUrlAt(int index);
-    QUrl getNextSongUrl();
-    QUrl getPreSongUrl();
+    inline void addPlayList(const QString& path){m_list.append(path);}
+    QString getPathAt(int index);
+    QString getNextSongPath();
+    QString getPreSongPath();
     void removeItem(int index);
-    QList<QUrl> getUrlList(){return m_list;}
+    QList<QString> getPathList(){return m_list;}
     void changePlayMode();
     PlayMode getCurrentPlayMode(){return m_playmode;}
 private:
     // Current play list.
-    QList<QUrl> m_list;
+    QList<QString> m_list;
     int m_currentIndex;
     // Current play index.
     PlayMode m_playmode;

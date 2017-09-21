@@ -16,7 +16,7 @@ public:
     ~LyricWidget(){}
 
     void setOriginState();
-    void currentMediaChanged(const QString& mediaTitle,QMediaContent currentMedia);
+    void currentMediaChanged(const QString& mediaTitle,const QString &currentMedia);
     void onCurrentPositionChanged(qint64 positon);
 
     int itemHeight() const;
@@ -24,7 +24,7 @@ public:
     virtual void paintItem(QPainter* painter, int index, QRect &rect);
     virtual void paintItemMask(QPainter *painter);
 private:
-    QMediaContent m_currentMedia;
+    QString m_currentMedia;
     QLabel *m_lblTip;
     LyricUtil *m_lyricUtil;
 

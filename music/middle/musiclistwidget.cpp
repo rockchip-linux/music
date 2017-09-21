@@ -70,13 +70,13 @@ void MusicListWidget::initConnection()
     connect(m_table,SIGNAL(longPressedEvent(int)),this,SIGNAL(tableLongPressed(int)));
 }
 
-void MusicListWidget::setPlayingMediaContent(QMediaContent content)
+void MusicListWidget::setPlayingMediaContent(QString filaPath)
 {
-    QList<QUrl> urlList = m_playlist->getUrlList();
+    QList<QString> pathList = m_playlist->getPathList();
     int index = -1;
-    for(int i=0;i < urlList.size();i++)
+    for(int i=0;i < pathList.size();i++)
     {
-        if(urlList.at(i)==content.canonicalUrl()){
+        if(pathList.at(i)==filaPath){
             index = i;
             break;
         }
@@ -93,7 +93,7 @@ void MusicListWidget::setOriginState()
 
 void MusicListWidget::deleteItem(int row)
 {
-    m_table->removeRow(row);
+    m_table->removeTableItem(row);
     m_playlist->removeItem(row);
     m_header->updateSongCountText(m_table->rowCount());
 
@@ -119,7 +119,7 @@ void MusicListWidget::updateLocalList(QFileInfoList fileInfoList)
 
     for(int i=0;i<fileInfoList.size();i++){
         QFileInfo fileInfo = fileInfoList.at(i);
-        if(!m_playlist->getUrlList().contains(QUrl::fromLocalFile(fileInfo.absoluteFilePath()))){
+        if(!m_playlist->getPathList().contains(fileInfo.absoluteFilePath())){
             insertIntoTable(fileInfo);
         }
     }

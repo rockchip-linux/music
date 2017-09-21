@@ -1,7 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>image/music/music_bg.jpg</file>
-        <file>image/music/music_top_icon.png</file>
         <file>image/music/btn_next (1).png</file>
         <file>image/music/btn_next (2).png</file>
         <file>image/music/btn_next (3).png</file>

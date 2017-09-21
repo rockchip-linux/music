@@ -3,7 +3,7 @@
 
 MediaList::MediaList(QObject *parent):QObject(parent)
 {
-    m_currentIndex = 0;
+    m_currentIndex = -1;
     m_list.empty();
 
     setPlayMode(PlayInOrder);
@@ -34,15 +34,15 @@ void MediaList::removeItem(int index)
     m_list.removeAt(index);
 }
 
-QUrl MediaList::getUrlAt(int index)
+QString MediaList::getPathAt(int index)
 {
     if(m_list.isEmpty())
-        return QUrl("");
+        return QString("");
     m_currentIndex = index;
     return m_list.value(index);
 }
 
-QUrl MediaList::getNextSongUrl()
+QString MediaList::getNextSongPath()
 {
     switch(m_playmode){
     case PlayOneCircle:
@@ -61,10 +61,10 @@ QUrl MediaList::getNextSongUrl()
         m_currentIndex = xxx;
         break;
     }
-    return getUrlAt(m_currentIndex);
+    return getPathAt(m_currentIndex);
 }
 
-QUrl MediaList::getPreSongUrl()
+QString MediaList::getPreSongPath()
 {
     switch(m_playmode){
     case PlayOneCircle:
@@ -83,7 +83,7 @@ QUrl MediaList::getPreSongUrl()
         m_currentIndex = xxx;
         break;
     }
-    return getUrlAt(m_currentIndex);
+    return getPathAt(m_currentIndex);
 }
 
 void MediaList::clearList()

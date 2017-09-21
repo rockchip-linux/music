@@ -100,7 +100,7 @@ void BottomWidgets::initLayout()
     mainLayout->addSpacing(0);
     mainLayout->addWidget(m_progressSlider);
     mainLayout->addLayout(controlLayout);
-    mainLayout->setContentsMargins(15,15,15,0);
+    mainLayout->setContentsMargins(0,0,0,0);
     mainLayout->setSpacing(0);
 
     setLayout(mainLayout);
@@ -157,6 +157,7 @@ void BottomWidgets::onPlayerPositionChanged(qint64 position,qint64 duration)
                     (duration % (1000 * 60 * 60)) / (1000 * 60),
                     (duration % (1000 * 60)) / 1000);
     setPositionLabel(QString(currentTime.toString("mm:ss").append("/").append(totalTime.toString("mm:ss"))));
+    m_progressSlider->setRange(0, duration);
     m_progressSlider->setValue(position);
 }
 

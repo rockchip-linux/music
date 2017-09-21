@@ -38,7 +38,7 @@ public:
     void updateLocalList(QFileInfoList fileList);
     MediaList* getMediaList(){return m_playlist;}
     void setOriginState();
-    void setPlayingMediaContent(QMediaContent);
+    void setPlayingMediaContent(QString);
     void deleteItem(int row);
 private:
     MediaList *m_playlist;

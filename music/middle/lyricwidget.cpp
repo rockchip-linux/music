@@ -41,23 +41,23 @@ void LyricWidget::clearLrc()
     update();
 }
 
-void LyricWidget::currentMediaChanged(const QString& mediaTitle,QMediaContent currentMedia)
+void LyricWidget::currentMediaChanged(const QString& mediaTitle,const QString &currentMedia)
 {
+    QString filePath = currentMedia;
+    QString fileName = currentMedia.mid(currentMedia.lastIndexOf("/") + 1);
+
     m_currentMedia = currentMedia;
     if(mediaTitle != NULL && mediaTitle != ""){
         m_lblTip->setText("当前歌曲: " + mediaTitle);
     }else{
-        m_lblTip->setText("正在播放: " + currentMedia.canonicalUrl().fileName());
+        m_lblTip->setText("正在播放: " + fileName);
     }
 
-    QString filePath = currentMedia.canonicalUrl().path();
     QString lrcPath = filePath.remove(filePath.lastIndexOf('.'),filePath.size()).append(".lrc");
-
-    qDebug("lrc file path: %s",qPrintable(lrcPath));
+    //    qDebug("lrc file path: %s",qPrintable(lrcPath));
     if(m_lyricUtil->analyzeLrcContent(lrcPath)){
         m_lblTip->setText("");
     }
-
 }
 
 int LyricWidget::itemHeight() const
@@ -75,7 +75,7 @@ void LyricWidget::paintItem(QPainter* painter, int index, QRect &rect)
 {
     int ih = itemHeight()*1.2/10;
     // Change Hight
-    //    int ch = m_itemOffset*1.2/10;
+    // int ch = m_itemOffset*1.2/10;
 
     if (index == m_currentItem){
 

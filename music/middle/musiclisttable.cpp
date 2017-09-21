@@ -59,11 +59,22 @@ void MusicListTable::playingItemChanged(int index)
     if(playingItemIndex != -1){
         item(playingItemIndex,3)->setText(playingItemSuffix);
     }
+
     if(index != -1){
         playingItemIndex = index;
         playingItemSuffix = item(index,3)->text();
         setCurrentCell(index,0);
         item(index,3)->setText("★★");
+    }
+}
+
+void MusicListTable::removeTableItem(int row)
+{
+    this->removeRow(row);
+    if(row < playingItemIndex){
+        playingItemIndex --;
+    }else if(row == playingItemIndex){
+        playingItemIndex = -1;
     }
 }
 

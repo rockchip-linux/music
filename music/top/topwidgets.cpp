@@ -5,6 +5,10 @@
 
 TopWidgets::TopWidgets(QWidget *parent):BaseWidget(parent)
 {
+    // Set background color.
+    setObjectName("TopWidgets");
+    setStyleSheet("#TopWidgets{background:rgb(231,155,155)}");
+
     initLayout();
     initConnection();
 }
@@ -21,7 +25,7 @@ void TopWidgets::initLayout()
     lyout1->addStretch(0);
     lyout1->setContentsMargins(0,0,0,0);
 
-    QLabel *titleLabel=new QLabel("music player",this);
+    QLabel *titleLabel=new QLabel("音乐播放器",this);
     QFont font = titleLabel->font();
     font.setPixelSize(font_size_big);
     titleLabel->setFont(font);

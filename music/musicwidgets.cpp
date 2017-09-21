@@ -6,15 +6,14 @@
 #include <QDirIterator>
 #include <QMessageBox>
 #include <QInputDialog>
-#include <QMediaMetaData>
+#include <QTextStream>
 
 #include "global_value.h"
 
 MusicWidgets::MusicWidgets(QWidget *parent):BaseWidget(parent)
 {
     setObjectName("MusicWidgets");
-    setStyleSheet("#MusicWidgets{border-image: url(:/image/music/music_bg.jpg);}"
-                  "QLabel{color:white;}");
+    setStyleSheet("QLabel{color:white;}");
 
     initData();
     initLayout();
@@ -33,6 +32,8 @@ void MusicWidgets::readSetting()
     MediaList *playList = m_middlewid->getListWidget()->getMediaList();
     playList->setPlayMode((PlayMode)playModeIndex);
     m_bottomwid->updatePlayModeIcon(playList->getCurrentPlayMode());
+    // Send current playMode back to service.
+    m_player->currentPlayModeChanged(playList->getCurrentPlayMode());
 
     // Set volume saved in configration file.
     QFile *volumnFile;
@@ -49,13 +50,16 @@ void MusicWidgets::readSetting()
     long volumnInt= volumnString.toInt();
 
     m_player->setVolume(volumnInt);
-    m_bottomwid->updateVolumeSliderValue(m_player->volume());
+    m_bottomwid->updateVolumeSliderValue(volumnInt);
 
     setting.endGroup();
 }
 
 void MusicWidgets::initData()
 {
+    m_player = new MusicPlayer(this);
+    m_player->connectToService();
+
     m_refreshSuffixList.append("mp3");
     m_refreshSuffixList.append("wave");
     m_refreshSuffixList.append("wma");
@@ -63,6 +67,12 @@ void MusicWidgets::initData()
     m_refreshSuffixList.append("midi");
     m_refreshSuffixList.append("ra");
     m_refreshSuffixList.append("mod");
+    m_refreshSuffixList.append("mp1");
+    m_refreshSuffixList.append("mp2");
+    m_refreshSuffixList.append("wav");
+    m_refreshSuffixList.append("flac");
+    m_refreshSuffixList.append("aac");
+    m_refreshSuffixList.append("m4a");
 }
 
 void MusicWidgets::initLayout()
@@ -82,12 +92,10 @@ void MusicWidgets::initLayout()
 
 void MusicWidgets::initPlayerAndConnection()
 {
-    m_player = new QMediaPlayer;
-
-    connect(m_player,SIGNAL(mediaStatusChanged(QMediaPlayer::MediaStatus)),this,SLOT(slot_onMediaStatusChanged(QMediaPlayer::MediaStatus)));
-    connect(m_player,SIGNAL(error(QMediaPlayer::Error)),this,SLOT(slot_onErrorOn(QMediaPlayer::Error)));
-    connect(m_player,SIGNAL(stateChanged(QMediaPlayer::State)),this,SLOT(slot_onStateChanged(QMediaPlayer::State)));
-    connect(m_player,SIGNAL(metaDataAvailableChanged(bool)),this,SLOT(slot_onMetaDataAvailableChanged(bool)));
+    connect(m_player,SIGNAL(mediaStatusChanged(MusicPlayer::MediaStatus)),this,SLOT(slot_onMediaStatusChanged(MusicPlayer::MediaStatus)));
+    connect(m_player,SIGNAL(error(MusicPlayer::Error)),this,SLOT(slot_onErrorOn(MusicPlayer::Error)));
+    connect(m_player,SIGNAL(stateChanged(MusicPlayer::State)),this,SLOT(slot_onStateChanged(MusicPlayer::State)));
+    connect(m_player,SIGNAL(metaDataAvailable()),this,SLOT(slot_onMetaDataAvailable()));
     connect(m_player,SIGNAL(positionChanged(qint64)),this,SLOT(slot_onPositonChanged(qint64)));
     connect(m_player,SIGNAL(durationChanged(qint64)),this,SLOT(slot_onDuratuonChanged(qint64)));
 
@@ -113,20 +121,20 @@ void MusicWidgets::slot_volumeChanged(int value)
     saveVolume(value);
 }
 
-void MusicWidgets::slot_onErrorOn(QMediaPlayer::Error)
+void MusicWidgets::slot_onErrorOn(MusicPlayer::Error)
 {
     m_player->setMedia(NULL);
-    if(QMessageBox::Yes == QMessageBox::critical(mainWindow,"Format Error","It has encountered an error.",
+    if(QMessageBox::Yes == QMessageBox::critical(mainWindow,"格式问题","音频格式不支持",
                                                  QMessageBox::Yes | QMessageBox::Yes))
     {
         setOriginState();
     }
 }
 
-void MusicWidgets::slot_onMediaStatusChanged(QMediaPlayer::MediaStatus status)
+void MusicWidgets::slot_onMediaStatusChanged(MusicPlayer::MediaStatus status)
 {
     switch(status){
-    case QMediaPlayer::EndOfMedia:
+    case MusicPlayer::EndOfMedia:
         slot_nextSong();
         break;
     default:
@@ -141,22 +149,20 @@ void MusicWidgets::setOriginState()
     m_middlewid->getLyricWidget()->setOriginState();
 }
 
-void MusicWidgets::slot_onStateChanged(QMediaPlayer::State state)
+void MusicWidgets::slot_onStateChanged(MusicPlayer::State state)
 {
-    if(state==QMediaPlayer::PlayingState){
+    if(state == MusicPlayer::PlayingState){
         m_bottomwid->setPauseStyle();
     }else{
         m_bottomwid->setPlayStyle();
     }
 }
 
-void MusicWidgets::slot_onMetaDataAvailableChanged(bool available)
+void MusicWidgets::slot_onMetaDataAvailable()
 {
-    if(available){
-        QString mediaName = m_player->metaData(QMediaMetaData::Title).toString();
-        m_middlewid->getLyricWidget()->currentMediaChanged(mediaName,m_player->currentMedia());
-        m_middlewid->getListWidget()->setPlayingMediaContent(m_player->currentMedia());
-    }
+    QString mediaName = m_player->currentMedia();
+    m_middlewid->getLyricWidget()->currentMediaChanged(m_player->getMediaTitle(),mediaName);
+    m_middlewid->getListWidget()->setPlayingMediaContent(mediaName);
 }
 
 void MusicWidgets::slot_onPositonChanged(qint64 position)
@@ -182,13 +188,15 @@ void MusicWidgets::slot_changePlayMode()
     MediaList *playList = m_middlewid->getListWidget()->getMediaList();
     playList->changePlayMode();
     m_bottomwid->updatePlayModeIcon(playList->getCurrentPlayMode());
+    // Send current playMode back to service.
+    m_player->currentPlayModeChanged(playList->getCurrentPlayMode());
 }
 
 void MusicWidgets::slot_refreshMediaResource()
 {
     bool isConfirm;
-    QString appendSuffix = QInputDialog::getText(mainWindow,"Add Refresh Suffix",
-                                                 "Please input extra file suffix",
+    QString appendSuffix = QInputDialog::getText(mainWindow,"添加过滤后缀",
+                                                 "输入新增过滤后缀,留空表示直接刷新",
                                                  QLineEdit::Normal,
                                                  "",
                                                  &isConfirm);
@@ -204,9 +212,9 @@ void MusicWidgets::slot_onTableItemClicked(int row,int)
 {
     m_player->stop();
     MediaList *playlist = m_middlewid->getListWidget()->getMediaList();
-    QUrl url= playlist->getUrlAt(row);
+    QString filePath= playlist->getPathAt(row);
     if(m_player->isAvailable()){
-        m_player->setMedia(url);
+        m_player->setMedia(filePath);
         m_player->play();
     }
 }
@@ -214,21 +222,20 @@ void MusicWidgets::slot_onTableItemClicked(int row,int)
 void MusicWidgets::slot_deleteTableItem(int row)
 {
     m_middlewid->getListWidget()->deleteItem(row);
-    m_middlewid->getListWidget()->setPlayingMediaContent(m_player->currentMedia());
 }
 
 void MusicWidgets::slot_fastForward()
 {
-    if(m_player->state()==QMediaPlayer::PlayingState||
-            m_player->state()==QMediaPlayer::PausedState){
-        m_player->setPosition(m_player->position()+5000);
+    if(m_player->state() == MusicPlayer::PlayingState||
+            m_player->state() == MusicPlayer::PausedState){
+        m_player->setPosition(m_player->position() + 5000);
     }
 }
 
 void MusicWidgets::slot_fastBackward()
 {
-    if(m_player->state()==QMediaPlayer::PlayingState||
-            m_player->state()==QMediaPlayer::PausedState){
+    if(m_player->state() == MusicPlayer::PlayingState||
+            m_player->state() == MusicPlayer::PausedState){
         m_player->setPosition(m_player->position()-5000);
     }
 }
@@ -238,10 +245,10 @@ void MusicWidgets::slot_nextSong()
     m_player->stop();
     MediaList *playlist = m_middlewid->getListWidget()->getMediaList();
     if(m_player->isAvailable()){
-        m_player->setMedia(playlist->getNextSongUrl());
+        m_player->setMedia(playlist->getNextSongPath());
         m_player->play();
     }
-    if(playlist->getUrlList().size() == 0){
+    if(playlist->getPathList().size() == 0){
         setOriginState();
     }
 }
@@ -251,17 +258,17 @@ void MusicWidgets::slot_preSong()
     m_player->stop();
     MediaList *playlist = m_middlewid->getListWidget()->getMediaList();
     if(m_player->isAvailable()){
-        m_player->setMedia(playlist->getPreSongUrl());
+        m_player->setMedia(playlist->getPreSongPath());
         m_player->play();
     }
-    if(playlist->getUrlList().size() == 0){
+    if(playlist->getPathList().size() == 0){
         setOriginState();
     }
 }
 
 void MusicWidgets::slot_playOrPause()
 {
-    if(m_player->state()==QMediaPlayer::PlayingState){
+    if(m_player->state()==MusicPlayer::PlayingState){
         m_player->pause();
     }else{
         if(m_player->isAudioAvailable() == true){
@@ -274,8 +281,8 @@ void MusicWidgets::updateUiByRes(QFileInfoList fileInfoList)
 {
     m_middlewid->getListWidget()->updateLocalList(fileInfoList);
 
-    if(m_player->currentMedia().canonicalUrl().toString()!=""){
-        slot_onMetaDataAvailableChanged(true);
+    if(m_player->currentMedia() != ""){
+        slot_onMetaDataAvailable();
     }
 }
 
@@ -290,6 +297,7 @@ void MusicWidgets::savaSetting()
 
 void MusicWidgets::slot_exit()
 {
+    m_player->clientExit();
     savaSetting();
     mainWindow->onApplicationClose();
 }
@@ -317,26 +325,28 @@ QFileInfoList MusicWidgets::findMusicFiles(const QString& path)
 
 void MusicWidgets::updateVolume(bool volumeAdd)
 {
+    int currenVolume = m_player->volume();
     if(volumeAdd){
-        if(m_player->volume()<95){
-            m_player->setVolume(m_player->volume()+5);
+        if(currenVolume < 95){
+            m_player->setVolume((currenVolume+5));
         }else{
             m_player->setVolume(100);
         }
     }else{
-        if(m_player->volume()>5){
-            m_player->setVolume(m_player->volume()-5);
+        if(currenVolume > 5){
+            m_player->setVolume(currenVolume - 5);
         }else{
             m_player->setVolume(0);
         }
     }
     m_bottomwid->updateVolumeSliderValue(m_player->volume());
-    saveVolume(m_player->volume());
 }
-void MusicWidgets::saveVolume(int volume){
 
-    QDir  settingsDir("/data/");
+void MusicWidgets::saveVolume(int volume)
+{
+    QDir settingsDir("/data/");
     QFile *volumeFile;
+
     if(settingsDir.exists()){
         volumeFile = new QFile("/data/volumn");
     }else{
@@ -345,11 +355,11 @@ void MusicWidgets::saveVolume(int volume){
 
     if (volumeFile->open(QFile::WriteOnly | QIODevice::Truncate)) {
         QTextStream out(volumeFile);
-        out <<volume;
+        out << volume;
         volumeFile->close();
-     }
-    delete volumeFile;
+    }
 }
+
 MusicWidgets::~MusicWidgets()
 {
 }

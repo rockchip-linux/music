@@ -15,6 +15,7 @@ bool LyricUtil::analyzeLrcContent(const QString& lrcFilePath)
     }
     lrcFile.open(QIODevice::ReadOnly);
     QTextStream lrcStream(&lrcFile);
+    lrcStream.setAutoDetectUnicode(true);
 
     QRegExp timeExp;
     timeExp.setPatternSyntax(QRegExp::RegExp);

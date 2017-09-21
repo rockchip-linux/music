@@ -6,7 +6,8 @@
 #include "top/topwidgets.h"
 #include "middle/middlewidgets.h"
 
-#include <QMediaPlayer>
+#include "player/musicplayer.h"
+#include <QEvent>
 
 /**
  * The main layout of music widgets.It is made up of 3 positional widgets.
@@ -29,7 +30,7 @@ public:
     void updateVolume(bool volumeAdd);
 private:
     QList<QString> m_refreshSuffixList;
-    QMediaPlayer *m_player;
+    MusicPlayer *m_player;
 
     TopWidgets *m_topwid;
     BottomWidgets *m_bottomwid;
@@ -52,9 +53,9 @@ private slots:
     void slot_changePlayMode();
     void slot_refreshMediaResource();
     // MediaPlayer...
-    void slot_onMediaStatusChanged(QMediaPlayer::MediaStatus);
-    void slot_onErrorOn(QMediaPlayer::Error);
-    void slot_onStateChanged(QMediaPlayer::State);
+    void slot_onMediaStatusChanged(MusicPlayer::MediaStatus);
+    void slot_onErrorOn(MusicPlayer::Error);
+    void slot_onStateChanged(MusicPlayer::State);
     void slot_onPositonChanged(qint64);
     void slot_onDuratuonChanged(qint64);
 
@@ -63,7 +64,7 @@ private slots:
     void slot_changePlayerProgress(int);
     void slot_exit();
 public slots:
-    void slot_onMetaDataAvailableChanged(bool);
+    void slot_onMetaDataAvailable();
 protected:
 
 };

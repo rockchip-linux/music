@@ -55,7 +55,7 @@ void MainWindow::slot_setUpdateFlag()
 
 void MainWindow::slot_updateMedia()
 {
-    qDebug()<<"Update media resource.";
+    qDebug("Update media resource.");
     MediaUpdateThread *thread = new MediaUpdateThread(this,this);
     thread->start();
     mediaHasUpdate =false;
