@@ -202,6 +202,10 @@ void MusicWidgets::slot_refreshMediaResource()
                                                  &isConfirm);
     if(isConfirm){
         if(!appendSuffix.isEmpty()){
+            if(appendSuffix.contains(".")){
+                QFileInfo fileInfo(appendSuffix);
+                appendSuffix=fileInfo.suffix();
+            }
             m_refreshSuffixList.append(appendSuffix);
         }
         mainWindow->slot_updateMedia();
