@@ -46,7 +46,7 @@ void MusicListTable::insertIntoTable(QString item1Text, QString item2Text)
     int rowcount= rowCount();
     insertRow(rowcount);
 
-    setItem(rowcount,1, new QTableWidgetItem(QIcon(":/image/music/btn_song_tip.png"),""));
+    setItem(rowcount,1, new QTableWidgetItem(QIcon(QPixmap(":/image/music/btn_song_tip.png")),""));
     setItem(rowcount,2, new QTableWidgetItem(item1Text));
     setItem(rowcount,3, new QTableWidgetItem(item2Text));
 

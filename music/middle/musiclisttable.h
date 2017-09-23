@@ -2,6 +2,7 @@
 #define MUISCLISTTABLE_H
 
 #include <base/basetablewidget.h>
+#include <QLabel>
 
 class MusicListTable:public BaseTableWidget
 {

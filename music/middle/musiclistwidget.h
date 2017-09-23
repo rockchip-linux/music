@@ -6,7 +6,6 @@
 #include "player/medialist.h"
 #include "musiclisttable.h"
 
-#include <QMediaContent>
 #include <QLabel>
 #include <QFileInfoList>
 

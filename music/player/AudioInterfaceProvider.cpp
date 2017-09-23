@@ -7,11 +7,13 @@
 #include <errno.h>
 #include <sys/msg.h>
 
-AudioInterfaceProvider::AudioInterfaceProvider(){
+AudioInterfaceProvider::AudioInterfaceProvider()
+{
     initMessageQueue();
 }
 
-void AudioInterfaceProvider::initMessageQueue(){
+void AudioInterfaceProvider::initMessageQueue()
+{
     sendQueueId = msgget(REQ_QUEUE_KET,MSG_QUEUE_FLAG|IPC_CREAT);
     printf("AudioInterface: send queue init. queueId: %d\n",sendQueueId);
     if(sendQueueId == -1){
@@ -25,7 +27,8 @@ void AudioInterfaceProvider::initMessageQueue(){
     }
 }
 
-void AudioInterfaceProvider::sendMessage(long int msgType,int intValue,char* textValue){
+void AudioInterfaceProvider::sendMessage(long int msgType,int intValue,char* textValue)
+{
     if(sendQueueId != -1){
         struct control_message message;
         message.msg_type = msgType;
@@ -63,7 +66,8 @@ bool AudioInterfaceProvider::sendMessageForResult(long int msgType,control_messa
     }
 }
 
-void AudioInterfaceProvider::setMedia(char *filePath){
+void AudioInterfaceProvider::setMedia(char *filePath)
+{
     sendMessage(REQ_TYPE_SET_MEDIA,0,filePath);
 }
 

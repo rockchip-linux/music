@@ -46,7 +46,4 @@ private:
     bool sendMessageForResult(long int msgType,control_message *message,int intValue = 0,char *textValue = 0);
 };
 
-
-
-
 #endif // __INTERFACE_PROVIDER_H__

@@ -6,7 +6,6 @@
 #include "lyricutil.h"
 
 #include <QLabel>
-#include <QMediaContent>
 
 class LyricWidget:public AbstractWheelWidget
 {

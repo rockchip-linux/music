@@ -32,6 +32,7 @@ public:
     QList<QString> getPathList(){return m_list;}
     void changePlayMode();
     PlayMode getCurrentPlayMode(){return m_playmode;}
+    void setCurrentIndex(int index){m_currentIndex = index;}
 private:
     // Current play list.
     QList<QString> m_list;

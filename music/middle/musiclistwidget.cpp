@@ -83,6 +83,7 @@ void MusicListWidget::setPlayingMediaContent(QString filaPath)
     }
     if(index!=-1){
         m_table->playingItemChanged(index);
+        m_playlist->setCurrentIndex(index);
     }
 }
 
