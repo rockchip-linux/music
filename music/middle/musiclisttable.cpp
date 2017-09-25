@@ -81,7 +81,10 @@ void MusicListTable::removeTableItem(int row)
 void MusicListTable::setOriginState()
 {
     setCurrentCell(-1,-1);
-    playingItemChanged(-1);
+    if(this->rowCount() > playingItemIndex && playingItemIndex != -1){
+        item(playingItemIndex,1)->setText(playingItemSuffix);
+    }
+    playingItemIndex = -1;
 }
 
 void MusicListTable::clearTable()

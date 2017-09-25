@@ -124,7 +124,7 @@ void MusicWidgets::slot_volumeChanged(int value)
 void MusicWidgets::slot_onErrorOn(MusicPlayer::Error)
 {
     m_player->setMedia(NULL);
-    if(QMessageBox::Yes == QMessageBox::critical(mainWindow,"格式问题","音频格式不支持",
+    if(QMessageBox::Yes == QMessageBox::critical(mainWindow,"格式问题","音频格式错误",
                                                  QMessageBox::Yes | QMessageBox::Yes))
     {
         setOriginState();
