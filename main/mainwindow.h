@@ -5,8 +5,8 @@
 
 #include "musicwidgets.h"
 #include "base/basewindow.h"
-#include "ueventthread.h"
-#include "inotifythread.h"
+
+#include "MediaNotificationReceiver.h"
 
 /**
  * The main window of application.
@@ -27,8 +27,7 @@ private:
     MusicWidgets *m_musicWid;
     bool mediaHasUpdate;
     // Thread for media resource update.
-    UeventThread *ueventThread;
-    InotifyThread *inotifyThread;
+    MediaNotificationReceiver m_notificationReceiver;
 
     void initData();
     void initLayout();

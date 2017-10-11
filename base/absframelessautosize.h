@@ -3,8 +3,6 @@
 
 #include <QWidget>
 #include <QMouseEvent>
-#include "ueventthread.h"
-#include "inotifythread.h"
 
 enum CursorPos{Default,Right,Left,Bottom,Top,TopRight,TopLeft,BottomRight,BottomLeft};
 struct pressWindowsState
