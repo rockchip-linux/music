@@ -17,6 +17,8 @@ BaseWindow::BaseWindow(QWidget *parent) : AbsFrameLessAutoSize(parent)
     fileIn.open(stdin, QIODevice::ReadOnly);
     QSocketNotifier* sn = new QSocketNotifier(fileIn.handle(), QSocketNotifier::Read, this);
     connect(sn, SIGNAL(activated(int)), this, SLOT(slot_readFromServer(int)));
+
+    setStyleSheet("QPushButton::pressed{background-color:rgb(204,228,247);border: 1px solid rgb(1 , 84 , 153);padding-left:3px;padding-top:3px;}");
 }
 
 void BaseWindow::slot_readFromServer(int fd)

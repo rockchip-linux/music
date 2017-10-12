@@ -23,7 +23,7 @@ void PlayListHeader::initLayout()
 {
     QHBoxLayout *layout=new QHBoxLayout;
 
-    m_listCountInfo = new QLabel(str_header_song_list+"(12)",this);
+    m_listCountInfo = new QLabel(str_header_song_list+"(0)",this);
     m_listCountInfo->setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
 
     QLabel *songTypeInfo = new QLabel(str_header_song_type,this);

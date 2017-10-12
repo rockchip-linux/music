@@ -8,6 +8,8 @@
 
 #include "MediaNotificationReceiver.h"
 
+class MediaUpdateThread;
+
 /**
  * The main window of application.
  *
@@ -29,6 +31,8 @@ private:
     // Thread for media resource update.
     MediaNotificationReceiver m_notificationReceiver;
 
+    MediaUpdateThread *mediaUpdateThread;
+
     void initData();
     void initLayout();
     void initConnection();
@@ -41,7 +45,6 @@ public slots:
     void slot_setUpdateFlag();
     void slot_updateMedia();
     void slot_updateUiByRes(QFileInfoList musicFileList);
-    void slot_standby();
 signals:
     void beginUpdateMediaResource();
     void updateUiByRes(QFileInfoList musicFileList);
@@ -51,9 +54,18 @@ class MediaUpdateThread:public QThread
 {
 public:
     MediaUpdateThread(QObject *parent ,MainWindow *mainWindow);
+    ~MediaUpdateThread(){}
+
+    void waitForThreadFinished();
+
 private:
     MainWindow *m_parent;
+    // List of search suffix when search video resource.
+    QList<QString> m_searchSuffixList;
+    QFileInfoList findMusicFiles(const QString& path);
+
 protected:
     void run();
+
 };
 #endif // MAINWINDOW_H

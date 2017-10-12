@@ -1,9 +1,12 @@
 #include "mainwindow.h"
 #include "global_value.h"
 #include <QVBoxLayout>
+#include <QDir>
+#include <QDirIterator>
 
-MainWindow::MainWindow(QWidget *parent) :BaseWindow(parent)
-  ,mediaHasUpdate(false)
+MainWindow::MainWindow(QWidget *parent) : BaseWindow(parent)
+  , mediaHasUpdate(false)
+  , mediaUpdateThread(0)
 {
     initData();
     initLayout();
@@ -55,8 +58,13 @@ void MainWindow::slot_setUpdateFlag()
 void MainWindow::slot_updateMedia()
 {
     qDebug("Update media resource.");
-    MediaUpdateThread *thread = new MediaUpdateThread(this,this);
-    thread->start();
+    if (mediaUpdateThread) {
+        delete mediaUpdateThread;
+        mediaUpdateThread = 0;
+    }
+
+    mediaUpdateThread = new MediaUpdateThread(this,this);
+    mediaUpdateThread->start();
     mediaHasUpdate =false;
 }
 
@@ -79,6 +87,9 @@ void MainWindow::enableApplication()
 
 void MainWindow::onApplicationClose()
 {
+    if (mediaUpdateThread && mediaUpdateThread->isRunning())
+        mediaUpdateThread->waitForThreadFinished();
+
     this->close();
 }
 
@@ -91,31 +102,67 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
     case Qt::Key_VolumeUp:
         m_musicWid->updateVolume(true);
         break;
-    case Qt::Key_PowerOff:
-        // When key_power enter
-        QTimer::singleShot(100, this, SLOT(slot_standby()));
-        break;
     default:
         break;
     }
-}
-
-void MainWindow::slot_standby()
-{
 }
 
 MainWindow::~MainWindow()
 {
 }
 
-MediaUpdateThread::MediaUpdateThread(QObject *parent,MainWindow *mainWindow):QThread(parent)
+MediaUpdateThread::MediaUpdateThread(QObject *parent, MainWindow *mainWindow):QThread(parent)
 {
     m_parent = mainWindow;
     qRegisterMetaType<QFileInfoList>("QFileInfoList");
+
+    m_searchSuffixList.append("mp3");
+    m_searchSuffixList.append("wave");
+    m_searchSuffixList.append("wma");
+    m_searchSuffixList.append("ogg");
+    m_searchSuffixList.append("midi");
+    m_searchSuffixList.append("ra");
+    m_searchSuffixList.append("mod");
+    m_searchSuffixList.append("mp1");
+    m_searchSuffixList.append("mp2");
+    m_searchSuffixList.append("wav");
+    m_searchSuffixList.append("flac");
+    m_searchSuffixList.append("aac");
+    m_searchSuffixList.append("m4a");
+}
+
+void MediaUpdateThread::waitForThreadFinished()
+{
+    requestInterruption();
+    quit();
+    wait();
+}
+
+QFileInfoList MediaUpdateThread::findMusicFiles(const QString &path)
+{
+    QFileInfoList musicFiles;
+
+    QDirIterator it(path, QDir::Files|QDir::Dirs|QDir::NoDotAndDotDot);
+    while (it.hasNext() && !isInterruptionRequested()){
+        QString name = it.next();
+        QFileInfo info(name);
+        if (info.isDir()){
+            musicFiles.append(findMusicFiles(name));
+        }
+        else{
+            for(int i = 0; i < m_searchSuffixList.count(); i++){
+                if(info.suffix().compare(m_searchSuffixList.at(i), Qt::CaseInsensitive) == 0){
+                    musicFiles.append(info);
+                }
+            }
+        }
+    }
+    return musicFiles;
 }
 
 void MediaUpdateThread::run()
 {
-    QFileInfoList musicFileList = m_parent->getMusicWidget()->findMusicFiles(MUSIC_SEARCH_PATH);
-    emit m_parent->updateUiByRes(musicFileList);
+    QFileInfoList musicFileList = findMusicFiles(MUSIC_SEARCH_PATH);
+    if (!isInterruptionRequested())
+        emit m_parent->updateUiByRes(musicFileList);
 }

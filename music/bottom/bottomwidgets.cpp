@@ -11,10 +11,10 @@ int layout3_size = 70;
 int layout3_temp = 25;
 int progress_slider_height = 20;
 #else
-int playButton_size = 50;
+int playButton_size = 55;
 int bottom_height = 80;
 int bottom_spacing = 20;
-int layout3_size = 40;
+int layout3_size = 45;
 int layout3_temp = 10;
 int progress_slider_height = 10;
 #endif
@@ -55,29 +55,11 @@ void BottomWidgets::initLayout()
     m_btnPlay->setFixedSize(playButton_size,playButton_size);
 
     m_btnNext->setStyleSheet("QPushButton{border-image:url(:/image/music/btn_next (1).png);}"
-                             "QPushButton::hover{border-image:url(:/image/music/btn_next (2).png);}"
-                             "QPushButton::pressed{border-image:url(:/image/music/btn_next (3).png);\
-                             background-color:rgb(204 , 228 , 247);\
-                             border: 1px solid rgb(1 , 84 , 153);\
-                             padding-left:3px;\
-                             padding-top:3px;\
-                             }");
+                             "QPushButton::hover{border-image:url(:/image/music/btn_next (2).png);}");
     m_btnPrevious->setStyleSheet("QPushButton{border-image:url(:/image/music/btn_previous (1).png);}"
-                                 "QPushButton::hover{border-image:url(:/image/music/btn_previous (2).png);}"
-                                 "QPushButton::pressed{border-image:url(:/image/music/btn_previous (3).png);\
-                                 background-color:rgb(204 , 228 , 247);\
-                                 border: 1px solid rgb(1 , 84 , 153);\
-                                 padding-left:3px;\
-                                 padding-top:3px;\
-                             }");
+                                 "QPushButton::hover{border-image:url(:/image/music/btn_previous (2).png);}");
     m_btnPlay->setStyleSheet("QPushButton{border-image:url(:/image/music/btn_play (1).png);}"
-                             "QPushButton::hover{border-image:url(:/image/music/btn_play (2).png);}"
-                             "QPushButton::pressed{border-image:url(:/image/music/btn_play (3).png);\
-                             background-color:rgb(204 , 228 , 247);\
-                             border: 1px solid rgb(1 , 84 , 153);\
-                             padding-left:3px;\
-                             padding-top:3px;\
-                            }");
+                             "QPushButton::hover{border-image:url(:/image/music/btn_play (2).png);}");
 
     QHBoxLayout *playControlLayout = new QHBoxLayout;
     playControlLayout->addWidget(m_btnPrevious);
@@ -89,23 +71,16 @@ void BottomWidgets::initLayout()
     // control layout3: volume、playmode
     m_volWid = new VolWidget(this);
     m_btnPlayMode = new FlatButton(this);
-    m_btnPlayMode->setFixedSize(layout3_size,layout3_size-layout3_temp);
+    m_btnPlayMode->setFixedSize(layout3_size,layout3_size);
     m_btnRefresh = new FlatButton(this);
     m_btnRefresh->setFixedSize(layout3_size,layout3_size);
-    m_btnRefresh->setStyleSheet("QPushButton{border-image:url(:/image/music/btn_refresh.png);}\
-                                QPushButton:pressed\
-                                {\
-                                    background-color:rgb(204 , 228 , 247);\
-                                    border: 1px solid rgb(1 , 84 , 153);\
-                                    padding-left:3px;\
-                                    padding-top:3px;\
-                                }");
+    m_btnRefresh->setStyleSheet("QPushButton{border-image:url(:/image/music/btn_refresh.png);}");
+    m_btnRefresh->setVisible(false);
 
     QHBoxLayout *layout3 = new QHBoxLayout;
     layout3->addStretch(0);
     layout3->addWidget(m_btnPlayMode);
     layout3->addWidget(m_volWid);
-    layout3->addWidget(m_btnRefresh);
     layout3->addStretch(0);
     layout3->setContentsMargins(0,0,0,0);
     layout3->setSpacing(bottom_spacing);
@@ -144,26 +119,14 @@ void BottomWidgets::initConnection()
 void BottomWidgets::setPauseStyle()
 {
     m_btnPlay->setStyleSheet("QPushButton{border-image:url(:/image/music/btn_pause (1).png);}"
-                             "QPushButton::hover{border-image:url(:/image/music/btn_pause (2).png);}"
-                             "QPushButton::pressed{border-image:url(:/image/music/btn_pause (3).png);\
-                             background-color:rgb(204 , 228 , 247);\
-                             border: 1px solid rgb(1 , 84 , 153);\
-                             padding-left:3px;\
-                             padding-top:3px;\
-                            }");
+                             "QPushButton::hover{border-image:url(:/image/music/btn_pause (2).png);}");
 
 }
 
 void BottomWidgets::setPlayStyle()
 {
     m_btnPlay->setStyleSheet("QPushButton{border-image:url(:/image/music/btn_play (1).png);}"
-                             "QPushButton::hover{border-image:url(:/image/music/btn_play (2).png);}"
-                             "QPushButton::pressed{border-image:url(:/image/music/btn_play (3).png);\
-                             background-color:rgb(204 , 228 , 247);\
-                             border: 1px solid rgb(1 , 84 , 153);\
-                             padding-left:3px;\
-                             padding-top:3px;\
-                            }");
+                             "QPushButton::hover{border-image:url(:/image/music/btn_play (2).png);}");
 
 }
 
@@ -199,34 +162,13 @@ void BottomWidgets::updatePlayModeIcon(PlayMode playMode)
 {
     switch(playMode){
     case PlayRandom:
-        m_btnPlayMode->setStyleSheet("QPushButton{border-image:url(:/image/music/btn_mode_random.png);}\
-                                     QPushButton:pressed\
-                                     {\
-                                         background-color:rgb(204 , 228 , 247);\
-                                         border: 1px solid rgb(1 , 84 , 153);\
-                                         padding-left:3px;\
-                                         padding-top:3px;\
-                                     }");
+        m_btnPlayMode->setStyleSheet("QPushButton{border-image:url(:/image/music/btn_mode_random.png);}");
         break;
     case PlayOneCircle:
-        m_btnPlayMode->setStyleSheet("QPushButton{border-image:url(:/image/music/btn_mode_single.png);}\
-                                     QPushButton:pressed\
-                                     {\
-                                         background-color:rgb(204 , 228 , 247);\
-                                         border: 1px solid rgb(1 , 84 , 153);\
-                                         padding-left:3px;\
-                                         padding-top:3px;\
-                                     }");
+        m_btnPlayMode->setStyleSheet("QPushButton{border-image:url(:/image/music/btn_mode_single.png);}");
         break;
     case PlayInOrder:
-        m_btnPlayMode->setStyleSheet("QPushButton{border-image:url(:/image/music/btn_mode_list.png);}\
-                                     QPushButton:pressed\
-                                     {\
-                                         background-color:rgb(204 , 228 , 247);\
-                                         border: 1px solid rgb(1 , 84 , 153);\
-                                         padding-left:3px;\
-                                         padding-top:3px;\
-                                     }");
+        m_btnPlayMode->setStyleSheet("QPushButton{border-image:url(:/image/music/btn_mode_list.png);}");
         break;
     }
 }

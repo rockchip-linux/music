@@ -26,6 +26,7 @@ void MessageHandler::initMessageQueue()
 MessageHandler::~MessageHandler()
 {
     requestInterruption();
+    terminate();
     quit();
     wait();
 }
@@ -34,9 +35,9 @@ void MessageHandler::run()
 {
     struct state_message message;
     do{
-        if(msgrcv(queueId,(void*)&message,sizeof(long long),0,IPC_NOWAIT) != -1){
+        if(msgrcv(queueId, (void*)&message, sizeof(long long), 0, 0) != -1){
             int messageValue = message.value;
-//            qDebug("Receive message with type: %ld,value: %d",message.msg_type,messageValue);
+            // qDebug("Receive message with type: %ld,value: %d",message.msg_type,messageValue);
             switch (message.msg_type){
             case RCV_TYPE_MEDIA_STATE_CHANGED:
                 emit mediaStatusChanged(messageValue);

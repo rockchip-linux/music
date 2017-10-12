@@ -2,11 +2,10 @@
 
 #include <QVBoxLayout>
 #include <QSettings>
-#include <QDir>
-#include <QDirIterator>
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QTextStream>
+#include <QDir>
 
 #include "global_value.h"
 
@@ -59,20 +58,6 @@ void MusicWidgets::initData()
 {
     m_player = new MusicPlayer(this);
     m_player->connectToService();
-
-    m_refreshSuffixList.append("mp3");
-    m_refreshSuffixList.append("wave");
-    m_refreshSuffixList.append("wma");
-    m_refreshSuffixList.append("ogg");
-    m_refreshSuffixList.append("midi");
-    m_refreshSuffixList.append("ra");
-    m_refreshSuffixList.append("mod");
-    m_refreshSuffixList.append("mp1");
-    m_refreshSuffixList.append("mp2");
-    m_refreshSuffixList.append("wav");
-    m_refreshSuffixList.append("flac");
-    m_refreshSuffixList.append("aac");
-    m_refreshSuffixList.append("m4a");
 }
 
 void MusicWidgets::initLayout()
@@ -124,11 +109,13 @@ void MusicWidgets::slot_volumeChanged(int value)
 void MusicWidgets::slot_onErrorOn(MusicPlayer::Error)
 {
     m_player->setMedia(NULL);
-    if(QMessageBox::Yes == QMessageBox::critical(mainWindow,"格式问题","音频格式错误",
-                                                 QMessageBox::Yes | QMessageBox::Yes))
-    {
-        setOriginState();
-    }
+    setOriginState();
+
+    QMessageBox *messageBox = new QMessageBox(QMessageBox::Critical, "格式问题",
+                                              "音频格式错误.", QMessageBox::Yes, mainWindow);
+    messageBox->setAttribute(Qt::WA_DeleteOnClose);
+    QTimer::singleShot(2500, messageBox, SLOT(close()));
+    messageBox->exec();
 }
 
 void MusicWidgets::slot_onMediaStatusChanged(MusicPlayer::MediaStatus status)
@@ -193,23 +180,8 @@ void MusicWidgets::slot_changePlayMode()
 }
 
 void MusicWidgets::slot_refreshMediaResource()
-{
-    bool isConfirm;
-    QString appendSuffix = QInputDialog::getText(mainWindow,"添加过滤后缀",
-                                                 "输入新增过滤后缀,留空表示直接刷新",
-                                                 QLineEdit::Normal,
-                                                 "",
-                                                 &isConfirm);
-    if(isConfirm){
-        if(!appendSuffix.isEmpty()){
-            if(appendSuffix.contains(".")){
-                QFileInfo fileInfo(appendSuffix);
-                appendSuffix=fileInfo.suffix();
-            }
-            m_refreshSuffixList.append(appendSuffix);
-        }
-        mainWindow->slot_updateMedia();
-    }
+{  
+    mainWindow->slot_updateMedia();
 }
 
 void MusicWidgets::slot_onTableItemClicked(int row,int)
@@ -225,7 +197,16 @@ void MusicWidgets::slot_onTableItemClicked(int row,int)
 
 void MusicWidgets::slot_deleteTableItem(int row)
 {
-    m_middlewid->getListWidget()->deleteItem(row);
+    QMessageBox box(QMessageBox::Warning,"question","Sure you want to remove the record ?");
+    box.setStandardButtons (QMessageBox::Yes|QMessageBox::Cancel);
+    if(box.exec() == QMessageBox::Yes){
+        MediaList *playlist = m_middlewid->getListWidget()->getMediaList();
+        QFile file(playlist->getPathAt(row));
+        if (file.exists())
+            file.remove();
+
+        m_middlewid->getListWidget()->deleteItem(row);
+    }
 }
 
 void MusicWidgets::slot_fastForward()
@@ -304,27 +285,6 @@ void MusicWidgets::slot_exit()
     m_player->clientExit();
     savaSetting();
     mainWindow->onApplicationClose();
-}
-
-QFileInfoList MusicWidgets::findMusicFiles(const QString& path)
-{
-    QFileInfoList musicFiles;
-
-    QDirIterator it(path,QDir::Files|QDir::Dirs|QDir::NoDotAndDotDot);
-    while(it.hasNext()){
-        QString name = it.next();
-        QFileInfo info(name);
-        if (info.isDir()){
-            musicFiles.append(findMusicFiles(name));
-        }else{
-            for(int i=0;i<m_refreshSuffixList.count();i++){
-                if(info.suffix().compare(m_refreshSuffixList.at(i),Qt::CaseInsensitive) == 0){
-                    musicFiles.append(info);
-                }
-            }
-        }
-    }
-    return musicFiles;
 }
 
 void MusicWidgets::updateVolume(bool volumeAdd)

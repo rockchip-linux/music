@@ -7,7 +7,6 @@
 #include "middle/middlewidgets.h"
 
 #include "player/musicplayer.h"
-#include <QEvent>
 
 /**
  * The main layout of music widgets.It is made up of 3 positional widgets.
@@ -25,11 +24,8 @@ public:
 
     // Update ui by search result.
     void updateUiByRes(QFileInfoList);
-    // Used to find out all music files in path
-    QFileInfoList findMusicFiles(const QString& path);
     void updateVolume(bool volumeAdd);
 private:
-    QList<QString> m_refreshSuffixList;
     MusicPlayer *m_player;
 
     TopWidgets *m_topwid;
