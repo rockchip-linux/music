@@ -2,20 +2,21 @@
 #define MESSAGEHANDLER_H
 
 #include <QThread>
-#include <QObject>
 
-class MessageHandler:public QThread
+class MessageHandler : public QThread
 {
     Q_OBJECT
 public:
-    MessageHandler(QObject *parent=0);
+    MessageHandler(QObject *parent = 0);
     ~MessageHandler();
+
 protected:
     void run();
+
 private:
     int queueId;
-
     void initMessageQueue();
+
 signals:
     void mediaStatusChanged(int);
     void stateChanged(int);

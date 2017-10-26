@@ -1,11 +1,10 @@
 #include "musicplayer.h"
-#include "global_value.h"
 
-MusicPlayer::MusicPlayer(QObject *parent):QObject(parent)
+MusicPlayer::MusicPlayer(QObject *parent) : QObject(parent)
 {
     provider = new AudioInterfaceProvider();
 
-    // Create a message queue handler thread for service message.
+    // create a message queue handler thread for service message.
     m_messageHandler = new MessageHandler(this);
     m_messageHandler->start();
 
@@ -14,23 +13,26 @@ MusicPlayer::MusicPlayer(QObject *parent):QObject(parent)
 
 void MusicPlayer::initConnection()
 {
-    connect(m_messageHandler,SIGNAL(mediaStatusChanged(int)),this,SLOT(slot_onMediaStatusChanged(int)));
-    connect(m_messageHandler,SIGNAL(stateChanged(int)),this,SLOT(slot_onStateChanged(int)));
-    connect(m_messageHandler,SIGNAL(metaDataAvailable()),this,SIGNAL(metaDataAvailable()));
-    connect(m_messageHandler,SIGNAL(error(int)),this,SLOT(slot_onError(int)));
-    connect(m_messageHandler,SIGNAL(positionChanged(long long)),this,SIGNAL(positionChanged(qint64)));
-    connect(m_messageHandler,SIGNAL(durationChanged(long long)),this,SIGNAL(durationChanged(qint64)));
+    connect(m_messageHandler, SIGNAL(mediaStatusChanged(int)), this, SLOT(slot_onMediaStatusChanged(int)));
+    connect(m_messageHandler, SIGNAL(stateChanged(int)), this, SLOT(slot_onStateChanged(int)));
+    connect(m_messageHandler, SIGNAL(metaDataAvailable()), this, SIGNAL(metaDataAvailable()));
+    connect(m_messageHandler, SIGNAL(error(int)), this, SLOT(slot_onError(int)));
+    connect(m_messageHandler, SIGNAL(positionChanged(long long)), this, SIGNAL(positionChanged(qint64)));
+    connect(m_messageHandler, SIGNAL(durationChanged(long long)), this, SIGNAL(durationChanged(qint64)));
 }
 
-void MusicPlayer::slot_onMediaStatusChanged(int newMediaState){
+void MusicPlayer::slot_onMediaStatusChanged(int newMediaState)
+{
     emit mediaStatusChanged(MediaStatus(newMediaState));
 }
 
-void MusicPlayer::slot_onStateChanged(int newState){
+void MusicPlayer::slot_onStateChanged(int newState)
+{
     emit stateChanged(State(newState));
 }
 
-void MusicPlayer::slot_onError(int errorCode){
+void MusicPlayer::slot_onError(int errorCode)
+{
     emit error(Error(errorCode));
 }
 
@@ -56,32 +58,29 @@ void MusicPlayer::setMedia(const QString &filePath)
 
 QString MusicPlayer::currentMedia()
 {
-    char* mediaName = provider->currentMedia();
-    if(mediaName != NULL){
+    char *mediaName = provider->currentMedia();
+    if (mediaName != NULL)
         return QString::fromLocal8Bit(mediaName);
-    }else{
+    else
         return QString("");
-    }
 }
 
 QString MusicPlayer::getMediaTitle()
 {
-    char* mediaTitle = provider->getTitle();
-    if(mediaTitle != NULL){
+    char *mediaTitle = provider->getTitle();
+    if (mediaTitle != NULL)
         return QString::fromLocal8Bit(mediaTitle);
-    }else{
+    else
         return QString("");
-    }
 }
 
 QString MusicPlayer::getMediaArtist()
 {
-    char* mediaArtist = provider->getArtist();
-    if(mediaArtist != NULL){
+    char *mediaArtist = provider->getArtist();
+    if (mediaArtist != NULL)
         return QString::fromLocal8Bit(mediaArtist);
-    }else{
+    else
         return QString("");
-    }
 }
 
 qint64 MusicPlayer::position()

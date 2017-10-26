@@ -1,15 +1,14 @@
 #ifndef BOTTOMWIDGETS_H
 #define BOTTOMWIDGETS_H
 
-#include <QLabel>
-#include <QTime>
-
 #include "base/basewidget.h"
 #include "base/basepushbutton.h"
 #include "player/medialist.h"
 #include "baseslider.h"
 #include "volwidget.h"
 
+#include <QTime>
+#include <QLabel>
 
 class BottomWidgets : public BaseWidget
 {
@@ -18,14 +17,14 @@ public:
     explicit BottomWidgets(QWidget *parent = 0);
     ~BottomWidgets(){}
 
-    void onPlayerPositionChanged(qint64,qint64);
+    void onPlayerPositionChanged(qint64, qint64);
     void onPlayerDurationChanged(qint64);
     void setPauseStyle();
     void setPlayStyle();
-    void setPositionLabel(const QString&);
     void setOriginState();
     void updateVolumeSliderValue(int);
     void updatePlayModeIcon(PlayMode);
+
 private:
     BaseSlider *m_progressSlider;
 
@@ -39,6 +38,8 @@ private:
 
     void initLayout();
     void initConnection();
+    void setPositionLabel(QTime currentTime, QTime totalTime);
+
 signals:
     void nextClick();
     void lastClick();
@@ -50,4 +51,5 @@ signals:
     void playModeClick();
     void refreshClick();
 };
+
 #endif // BottomWidgets_H

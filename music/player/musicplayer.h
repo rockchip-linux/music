@@ -1,16 +1,14 @@
 #ifndef MUSICPLAYER_H
 #define MUSICPLAYER_H
 
-#include <QObject>
-
 #include "messagehandler.h"
 #include "AudioInterfaceProvider.h"
 
-class MusicPlayer:public QObject
+class MusicPlayer : public QObject
 {
     Q_OBJECT
 public:
-    MusicPlayer(QObject *parent=0);
+    MusicPlayer(QObject *parent = 0);
     ~MusicPlayer(){}
 
     enum State
@@ -43,7 +41,7 @@ public:
         ServiceMissingError,
         MediaIsPlaylist
     };
-public:
+
     void play();
     void pause();
     void stop();
@@ -69,11 +67,13 @@ public:
     void connectToService();
 
     void currentPlayModeChanged(int currentPlayMode);
+
 private:
     AudioInterfaceProvider *provider;
     MessageHandler *m_messageHandler;
 
     void initConnection();
+
 private slots:
     void slot_onMediaStatusChanged(int);
     void slot_onStateChanged(int);

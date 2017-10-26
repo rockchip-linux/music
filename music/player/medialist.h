@@ -1,12 +1,13 @@
 #ifndef MEDIALIST_H
 #define MEDIALIST_H
-#include<QUrl>
+
+#include <QUrl>
 #include <QObject>
 
-enum PlayMode{
-    PlayInOrder=0,
-    PlayRandom=1,
-    PlayOneCircle=2
+enum PlayMode {
+    PlayInOrder = 0,
+    PlayRandom = 1,
+    PlayOneCircle = 2
 };
 
 /**
@@ -15,7 +16,7 @@ enum PlayMode{
  * Each video item saved with url and you can add、remove
  * or get music item.
  */
-class MediaList:public QObject
+class MediaList : public QObject
 {
     Q_OBJECT
 public:
@@ -23,21 +24,39 @@ public:
 
     void clearList();
     void setPlayMode(PlayMode);
-    int getPlayMode(){return m_playmode;}
-    inline void addPlayList(const QString& path){m_list.append(path);}
+    int getPlayMode();
+
     QString getPathAt(int index);
     QString getNextSongPath();
     QString getPreSongPath();
+
     void removeItem(int index);
-    QList<QString> getPathList(){return m_list;}
     void changePlayMode();
-    PlayMode getCurrentPlayMode(){return m_playmode;}
-    void setCurrentIndex(int index){m_currentIndex = index;}
+
+    inline void addPlayList(const QString& path)
+    {
+        m_list.append(path);
+    }
+
+    QList<QString> getPathList()
+    {
+        return m_list;
+    }
+
+    PlayMode getCurrentPlayMode()
+    {
+        return m_playmode;
+    }
+
+    void setCurrentIndex(int index)
+    {
+        m_currentIndex = index;
+    }
+
 private:
-    // Current play list.
-    QList<QString> m_list;
     int m_currentIndex;
-    // Current play index.
+
+    QList<QString> m_list;
     PlayMode m_playmode;
 };
 

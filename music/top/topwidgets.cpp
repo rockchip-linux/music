@@ -1,47 +1,43 @@
 #include "topwidgets.h"
+#include "constant.h"
+#include "base/basepushbutton.h"
+
 #include <QHBoxLayout>
 #include <QLabel>
-#include "global_value.h"
 
-TopWidgets::TopWidgets(QWidget *parent):BaseWidget(parent)
+TopWidgets::TopWidgets(QWidget *parent) : BaseWidget(parent)
 {
-    // Set background color.
-    setObjectName("TopWidgets");
-    setStyleSheet("#TopWidgets{background:rgb(231,155,155)}");
+    setBackgroundColor(231, 155, 155);
 
     initLayout();
-    initConnection();
 }
 
 void TopWidgets::initLayout()
 {
-    QHBoxLayout *hmainyout=new QHBoxLayout;
+    QHBoxLayout *hmainyout = new QHBoxLayout;
 
-    m_btnreturn=new FourStateButton(return_resource_str,this);
-    m_btnreturn->setFixedSize(return_icon_width,return_icon_height);
+    FourStateButton *btnReturn = new FourStateButton(return_resource_str, this);
+    btnReturn->setFixedSize(return_icon_width, return_icon_height);
 
-    QHBoxLayout *lyout1 = new QHBoxLayout;
-    lyout1->addWidget(m_btnreturn);
-    lyout1->addStretch(0);
-    lyout1->setContentsMargins(0,0,0,0);
+    QHBoxLayout *layout1 = new QHBoxLayout;
+    layout1->addWidget(btnReturn);
+    layout1->addStretch(0);
 
-    QLabel *titleLabel=new QLabel("音乐播放器",this);
-    QFont font = titleLabel->font();
-    font.setPixelSize(font_size_big);
-    titleLabel->setFont(font);
+    QLabel *titleLabel=new QLabel(tr("music player"), this);
+    BaseWidget::setWidgetFontSize(titleLabel, font_size_big);
     titleLabel->setAlignment(Qt::AlignCenter);
 
-    hmainyout->addLayout(lyout1,1);
-    hmainyout->addWidget(titleLabel,1);
+    hmainyout->addLayout(layout1, 1);
+    hmainyout->addWidget(titleLabel, 1);
     hmainyout->addStretch(1);
-    hmainyout->setContentsMargins(0,0,0,0);
-    hmainyout->setSpacing(0);
-    setLayout(hmainyout);
-}
 
-void TopWidgets::initConnection()
-{
-    connect(m_btnreturn,SIGNAL(clicked(bool)),this,SIGNAL(returnClick()));
+    hmainyout->setMargin(0);
+    hmainyout->setSpacing(0);
+
+    setLayout(hmainyout);
+
+    // passing out return signal.
+    connect(btnReturn, SIGNAL(clicked(bool)), this, SIGNAL(returnClick()));
 }
 
 TopWidgets::~TopWidgets()

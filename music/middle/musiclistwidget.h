@@ -1,15 +1,14 @@
 #ifndef MIDDLELEFTSTACKWIDGET0_H
 #define MIDDLELEFTSTACKWIDGET0_H
 
-#include "base/basewidget.h"
-#include "base/basepushbutton.h"
+#include "basewidget.h"
 #include "player/medialist.h"
 #include "musiclisttable.h"
 
 #include <QLabel>
 #include <QFileInfoList>
 
-class PlayListHeader:public BaseWidget
+class PlayListHeader : public BaseWidget
 {
     Q_OBJECT
 public:
@@ -17,28 +16,33 @@ public:
     ~PlayListHeader(){}
 
     void updateSongCountText(int songCount);
+
 private:
     QLabel *m_listCountInfo;
-
     void initLayout();
+
 signals:
     void sig_emptyList();
     void sig_addSong();
 };
 
-class MusicListWidget: public BaseWidget
+class MusicListWidget : public BaseWidget
 {
     Q_OBJECT
 public:
     explicit MusicListWidget(QWidget *parent);
     ~MusicListWidget(){}
 
-    /* Update table by search result. */
+    /* update table by search result. */
     void updateLocalList(QFileInfoList fileList);
-    MediaList* getMediaList(){return m_playlist;}
     void setOriginState();
     void setPlayingMediaContent(QString);
     void deleteItem(int row);
+    MediaList* getMediaList()
+    {
+        return m_playlist;
+    }
+
 private:
     MediaList *m_playlist;
     PlayListHeader *m_header;
@@ -48,8 +52,9 @@ private:
     void initConnection();
     void insertIntoTable(const QFileInfo&);
     void updateSongCountLabel();
+
 signals:
-    void tableClick(int,int);
+    void tableClick(int, int);
     void tableLongPressed(int);
 };
 

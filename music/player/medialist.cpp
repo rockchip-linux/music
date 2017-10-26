@@ -1,9 +1,10 @@
 #include "medialist.h"
+
 #include <QTime>
 
-MediaList::MediaList(QObject *parent):QObject(parent)
+MediaList::MediaList(QObject *parent) : QObject(parent)
+  , m_currentIndex(-1)
 {
-    m_currentIndex = -1;
     m_list.empty();
 
     setPlayMode(PlayInOrder);
@@ -12,6 +13,11 @@ MediaList::MediaList(QObject *parent):QObject(parent)
 void MediaList::setPlayMode(PlayMode playmode)
 {
     m_playmode = playmode;
+}
+
+int MediaList::getPlayMode()
+{
+    return m_playmode;
 }
 
 void MediaList::changePlayMode()
@@ -36,51 +42,57 @@ void MediaList::removeItem(int index)
 
 QString MediaList::getPathAt(int index)
 {
-    if(m_list.isEmpty())
+    if (m_list.isEmpty())
         return QString("");
+
     m_currentIndex = index;
     return m_list.value(index);
 }
 
 QString MediaList::getNextSongPath()
 {
-    switch(m_playmode){
+    switch (m_playmode) {
     case PlayOneCircle:
         break;
     case PlayInOrder:
-        if(m_currentIndex+1 >= m_list.count()){
+        if (m_currentIndex + 1 >= m_list.count())
             m_currentIndex = 0;
-        }else{
-            m_currentIndex ++;
-        }
+        else
+            m_currentIndex++;
         break;
-    case PlayRandom:
-        QTime time= QTime::currentTime();
-        qsrand(time.msec()+time.second()*1000);
-        int xxx=qrand()%m_list.count();
+    case PlayRandom: {
+        QTime time = QTime::currentTime();
+        qsrand(time.msec() + time.second() * 1000);
+        int xxx = qrand() % m_list.count();
         m_currentIndex = xxx;
         break;
     }
+    default:
+        break;
+    }
+
     return getPathAt(m_currentIndex);
 }
 
 QString MediaList::getPreSongPath()
 {
-    switch(m_playmode){
+    switch (m_playmode) {
     case PlayOneCircle:
         break;
     case PlayInOrder:
-        if(m_currentIndex == 0){
+        if (m_currentIndex == 0)
             m_currentIndex = 0;
-        }else{
+        else
             m_currentIndex--;
-        }
         break;
-    case PlayRandom:
-        QTime time= QTime::currentTime();
-        qsrand(time.msec()+time.second()*1000);
-        int xxx=qrand()%m_list.count();
+    case PlayRandom: {
+        QTime time = QTime::currentTime();
+        qsrand(time.msec() + time.second() * 1000);
+        int xxx = qrand() % m_list.count();
         m_currentIndex = xxx;
+        break;
+    }
+    default:
         break;
     }
     return getPathAt(m_currentIndex);

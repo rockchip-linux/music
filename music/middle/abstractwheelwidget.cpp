@@ -1,22 +1,24 @@
 #include "abstractwheelwidget.h"
+
 #include <QScroller>
 #include <QScrollPrepareEvent>
 #include <QPainter>
 
-// Define a huge number to prevent scroll to the end.
+// define a huge number to prevent scroll to the end.
 #define WHEEL_SCROLL_OFFSET 50000
 #define SCROLL_TIME 200
 
-AbstractWheelWidget::AbstractWheelWidget(QWidget *parent):BaseWidget(parent)
-  ,m_currentItem(0)
-  ,m_itemOffset(0)
+AbstractWheelWidget::AbstractWheelWidget(QWidget *parent) : BaseWidget(parent)
+  , m_currentItem(0)
+  , m_itemOffset(0)
+  , m_isScrolled(false)
+  , m_doSignal(false)
 {
-    this->m_isScrolled = false;
-    this->m_doSignal = true;
 }
 
 AbstractWheelWidget::~AbstractWheelWidget()
-{ }
+{
+}
 
 int AbstractWheelWidget::currentIndex() const
 {
@@ -32,13 +34,13 @@ void AbstractWheelWidget::setCurrentIndex(int index)
     }
 }
 
-bool AbstractWheelWidget::event(QEvent *e)
+bool AbstractWheelWidget::event(QEvent *event)
 {
-    switch (e->type()){
-    case QEvent::ScrollPrepare:{
-        QScrollPrepareEvent *se = static_cast<QScrollPrepareEvent *>(e);
+    switch (event->type()) {
+    case QEvent::ScrollPrepare: {
+        QScrollPrepareEvent *se = static_cast<QScrollPrepareEvent *>(event);
         se->setViewportSize(QSizeF(size()));
-        // We claim a huge scrolling area and a huge content position and
+        // we claim a huge scrolling area and a huge content position and
         // hope that the user doesn't notice that the scroll area is restricted
         se->setContentPosRange(QRectF(0.0, 0.0, 0.0, WHEEL_SCROLL_OFFSET*2));
         se->setContentPos(QPointF(0.0, WHEEL_SCROLL_OFFSET + m_currentItem * itemHeight() + m_itemOffset));
@@ -46,45 +48,45 @@ bool AbstractWheelWidget::event(QEvent *e)
 
         return true;
     }
-    case QEvent::Scroll:{
-        QScrollEvent *se = static_cast<QScrollEvent *>(e);
-        qreal y = se->contentPos().y();
+    case QEvent::Scroll: {
+        QScrollEvent *se = static_cast<QScrollEvent *>(event);
 
+        qreal y = se->contentPos().y();
         int iy = y - WHEEL_SCROLL_OFFSET;
         int ih = itemHeight();
 
-
-        // -- Calculate the current item position and offset and redraw the widget
+        // -- calculate the current item position and offset and redraw the widget
         int ic = itemCount();
-        if (ic>0){
+        if (ic > 0) {
             m_currentItem = iy / ih;
             m_itemOffset = iy % ih;
 
             if (m_currentItem >= ic)
-                m_currentItem = ic-1;
+                m_currentItem = ic - 1;
         }
 
-        if (m_doSignal){
-            if (se->scrollState() == QScrollEvent::ScrollStarted)
-            {
-                if(m_currentItem>1)
+        if (m_doSignal) {
+            if (se->scrollState() == QScrollEvent::ScrollStarted) {
+                if (m_currentItem > 1)
                     this->m_isScrolled = true;
             }
         }
 
-        if (se->scrollState() == QScrollEvent::ScrollFinished){
-            if (m_doSignal){
-                if(m_currentItem>1)
-                    emit changeTo(this->m_currentItem+1);
-                m_maskLength=0;
-                m_realCurrentText="";
+        if (se->scrollState() == QScrollEvent::ScrollFinished) {
+            if (m_doSignal) {
+                if (m_currentItem > 1)
+                    emit changeTo(this->m_currentItem + 1);
+                m_maskLength = 0;
+                m_realCurrentText = "";
             }
             this->m_isScrolled = false;
             m_doSignal = true;
             m_itemOffset = 0;
         }
-        if(m_itemOffset!=0)
+
+        if (m_itemOffset != 0)
             update();
+
         se->accept();
         return true;
     }
@@ -92,7 +94,7 @@ bool AbstractWheelWidget::event(QEvent *e)
         setFocus();
         return true;
     default:
-        return QWidget::event(e);
+        return QWidget::event(event);
     }
     return true;
 }
@@ -103,23 +105,24 @@ void AbstractWheelWidget::paintEvent(QPaintEvent*)
 
     int w = width();
     int h = height();
-
     int iH = itemHeight();
     int iC = itemCount();
-    if (iC > 0){
-        // Just to print the lyric on the height of the widget
-        for (int i = -h/2/iH; i <= h/2/iH; i++){
+
+    if (iC > 0) {
+        // just to print the lyric on the height of the widget.
+        for (int i = -h/2/iH; i <= h/2/iH; i++) {
             int itemNum = m_currentItem + i;
-            if (itemNum >= 0 && itemNum < iC){
-                int len = h/2/iH;
-                // Parabola attenuation ,the value is betweent 220 to 255
+            if (itemNum >= 0 && itemNum < iC) {
+                int len = h / 2 / iH;
+                // parabola attenuation ,the value is betweent 220 to 255
                 int t = abs(i);
-                t = 255-t*t*220/len/len;
+                t = 255 - t * t * 220 / len / len;
 
                 if (t < 0)
                     t = 0;
+
                 painter.setPen(QColor(0, 0, 0, t));
-                QRect rect(0, h/2 +i*iH - m_itemOffset, w, iH);
+                QRect rect(0, h/2 + i*iH - m_itemOffset, w, iH);
                 paintItem(&painter, itemNum, rect);
             }
         }
@@ -135,7 +138,7 @@ void AbstractWheelWidget::paintEvent(QPaintEvent*)
 */
 void AbstractWheelWidget::scrollTo(int index)
 {
-    // Users do not use mouse to scroll the lyric content
+    // users do not use mouse to scroll the lyric content
     this->m_doSignal = false;
     QScroller *scroller = QScroller::scroller(this);
     scroller->scrollTo(QPointF(0, WHEEL_SCROLL_OFFSET + index * itemHeight()), 0);

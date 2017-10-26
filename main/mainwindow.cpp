@@ -1,44 +1,57 @@
 #include "mainwindow.h"
-#include "global_value.h"
+#include "constant.h"
+
 #include <QVBoxLayout>
 #include <QDir>
 #include <QDirIterator>
+#include <QStandardPaths>
+
+const QString MUSIC_SEARCH_PATH = QStandardPaths::writableLocation(QStandardPaths::HomeLocation).append("/mnt");
 
 MainWindow::MainWindow(QWidget *parent) : BaseWindow(parent)
   , mediaHasUpdate(false)
-  , mediaUpdateThread(0)
+  , m_mediaUpdateThread(0)
 {
     initData();
     initLayout();
     initConnection();
+
     slot_updateMedia();
 }
 
 void MainWindow::initData()
 {
-    // Initialize global main class of 'MainWindow' for other widgets invokes.
+    setStyleSheet("QPushButton:pressed{padding:2px;background:rgb(204,228,247)}");
+
+    // initialize global main class of 'MainWindow' for other widgets invokes.
     mainWindow = this;
+
     // Start media source update thread.
     // Uevent for usb and inotify for file modify.
-    m_notificationReceiver.receive();
+    m_mediaUpdateReceiver = new MediaNotificationReceiver();
+    m_mediaUpdateReceiver->receive();
 
+    m_mediaUpdateThread = new MediaUpdateThread(this);
 }
 
-void MainWindow::initLayout(){    
+void MainWindow::initLayout()
+{
     QVBoxLayout *mainLayout = new QVBoxLayout;
 
     m_musicWid = new MusicWidgets(this);
 
     mainLayout->addWidget(m_musicWid);
-    mainLayout->setContentsMargins(0,0,0,0);
+    mainLayout->setMargin(0);
+    mainLayout->setSpacing(0);
+
     setLayout(mainLayout);
 }
 
 void MainWindow::initConnection()
 {
-    connect(this,SIGNAL(beginUpdateMediaResource()),this,SLOT(slot_setUpdateFlag()));
-    connect(this,SIGNAL(updateUiByRes(QFileInfoList)),this,SLOT(slot_updateUiByRes(QFileInfoList)));
-    connect(&m_notificationReceiver,SIGNAL(mediaNotification(MediaNotification*)),this,SLOT(slot_setUpdateFlag()));
+    connect(this, SIGNAL(beginUpdateMediaResource()), this, SLOT(slot_setUpdateFlag()));
+    connect(this, SIGNAL(searchResultAvailable(QFileInfoList)),this, SLOT(slot_handleSearchResult(QFileInfoList)));
+    connect(m_mediaUpdateReceiver, SIGNAL(mediaNotification(MediaNotification*)), this, SLOT(slot_setUpdateFlag()));
 }
 
 void MainWindow::slot_setUpdateFlag()
@@ -48,27 +61,25 @@ void MainWindow::slot_setUpdateFlag()
      * So set a 500ms duration to ignore theres no-use siganls.
      * Note: it is expected to optimize.
      */
-    if(!mediaHasUpdate)
-    {
+    if (!mediaHasUpdate) {
         mediaHasUpdate = true;
-        QTimer::singleShot(500,this,SLOT(slot_updateMedia()));
+        QTimer::singleShot(500, this, SLOT(slot_updateMedia()));
     }
 }
 
 void MainWindow::slot_updateMedia()
 {
-    qDebug("Update media resource.");
-    if (mediaUpdateThread) {
-        delete mediaUpdateThread;
-        mediaUpdateThread = 0;
+    if (m_mediaUpdateThread->isRunning()) {
+        mediaHasUpdate = false;
+        return;
     }
 
-    mediaUpdateThread = new MediaUpdateThread(this,this);
-    mediaUpdateThread->start();
-    mediaHasUpdate =false;
+    qDebug("Update media resource.");
+    m_mediaUpdateThread->start();
+    mediaHasUpdate = false;
 }
 
-void MainWindow::slot_updateUiByRes(QFileInfoList musicFileList)
+void MainWindow::slot_handleSearchResult(QFileInfoList musicFileList)
 {
     m_musicWid->updateUiByRes(musicFileList);
 }
@@ -85,17 +96,27 @@ void MainWindow::enableApplication()
     this->setVisible(true);
 }
 
-void MainWindow::onApplicationClose()
+void MainWindow::exitApplication()
 {
-    if (mediaUpdateThread && mediaUpdateThread->isRunning())
-        mediaUpdateThread->waitForThreadFinished();
+    if (m_mediaUpdateReceiver) {
+        delete m_mediaUpdateReceiver;
+        m_mediaUpdateReceiver = 0;
+    }
+
+    if (m_mediaUpdateThread->isRunning())
+        m_mediaUpdateThread->waitForThreadFinished();
 
     this->close();
 }
 
+MusicWidgets* MainWindow::getMusicWidget()
+{
+    return m_musicWid;
+}
+
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
-    switch(event->key()){
+    switch (event->key()) {
     case Qt::Key_VolumeDown:
         m_musicWid->updateVolume(false);
         break;
@@ -111,10 +132,9 @@ MainWindow::~MainWindow()
 {
 }
 
-MediaUpdateThread::MediaUpdateThread(QObject *parent, MainWindow *mainWindow):QThread(parent)
+MediaUpdateThread::MediaUpdateThread(MainWindow *parent) : QThread(parent)
 {
-    m_parent = mainWindow;
-    qRegisterMetaType<QFileInfoList>("QFileInfoList");
+    m_parent = parent;
 
     m_searchSuffixList.append("mp3");
     m_searchSuffixList.append("wave");
@@ -129,6 +149,8 @@ MediaUpdateThread::MediaUpdateThread(QObject *parent, MainWindow *mainWindow):QT
     m_searchSuffixList.append("flac");
     m_searchSuffixList.append("aac");
     m_searchSuffixList.append("m4a");
+
+    qRegisterMetaType<QFileInfoList>("QFileInfoList");
 }
 
 void MediaUpdateThread::waitForThreadFinished()
@@ -142,18 +164,17 @@ QFileInfoList MediaUpdateThread::findMusicFiles(const QString &path)
 {
     QFileInfoList musicFiles;
 
-    QDirIterator it(path, QDir::Files|QDir::Dirs|QDir::NoDotAndDotDot);
-    while (it.hasNext() && !isInterruptionRequested()){
+    QDirIterator it(path, QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
+    while (it.hasNext() && !isInterruptionRequested()) {
         QString name = it.next();
         QFileInfo info(name);
-        if (info.isDir()){
+        if (info.isDir()) {
             musicFiles.append(findMusicFiles(name));
         }
         else{
-            for(int i = 0; i < m_searchSuffixList.count(); i++){
-                if(info.suffix().compare(m_searchSuffixList.at(i), Qt::CaseInsensitive) == 0){
+            for (int i = 0; i < m_searchSuffixList.count(); i++) {
+                if (info.suffix().compare(m_searchSuffixList.at(i), Qt::CaseInsensitive) == 0)
                     musicFiles.append(info);
-                }
             }
         }
     }
@@ -164,5 +185,5 @@ void MediaUpdateThread::run()
 {
     QFileInfoList musicFileList = findMusicFiles(MUSIC_SEARCH_PATH);
     if (!isInterruptionRequested())
-        emit m_parent->updateUiByRes(musicFileList);
+        emit m_parent->searchResultAvailable(musicFileList);
 }

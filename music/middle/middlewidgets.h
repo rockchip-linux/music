@@ -1,8 +1,7 @@
 #ifndef MIDDLEWIDGETS_H
 #define MIDDLEWIDGETS_H
 
-#include <QWidget>
-#include "base/basewidget.h"
+#include "basewidget.h"
 #include "musiclistwidget.h"
 #include "lyricwidget.h"
 
@@ -17,8 +16,16 @@ public:
     explicit MiddleWidgets(QWidget *parent = 0);
     ~MiddleWidgets();
 
-    MusicListWidget* getListWidget(){return m_listWid;}
-    LyricWidget* getLyricWidget(){return m_lyricWid;}
+    MusicListWidget* getListWidget()
+    {
+        return m_listWid;
+    }
+
+    LyricWidget* getLyricWidget()
+    {
+        return m_lyricWid;
+    }
+
 private:
     MusicListWidget *m_listWid;
     LyricWidget *m_lyricWid;

@@ -1,9 +1,9 @@
 #ifndef ABSTRACTWHEELWIDGET_H
 #define ABSTRACTWHEELWIDGET_H
 
-#include "base/basewidget.h"
+#include "basewidget.h"
 
-class AbstractWheelWidget:public BaseWidget
+class AbstractWheelWidget : public BaseWidget
 {
     Q_OBJECT
 public:
@@ -13,14 +13,15 @@ public:
     inline  int currentIndex() const;
     void setCurrentIndex(int index);
 
-    virtual void paintItem(QPainter* painter, int index, QRect &rect) = 0;
-    virtual void paintItemMask(QPainter* painter)= 0;
+    virtual void paintItem(QPainter *painter, int index, QRect &rect) = 0;
+    virtual void paintItemMask(QPainter *painter) = 0;
 
     virtual int itemHeight() const = 0;
     virtual int itemCount() const = 0;
 
 public slots:
     void scrollTo(int index);
+
 signals:
     void stopped(int index);
     void changeTo(int index);

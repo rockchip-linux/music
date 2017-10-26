@@ -24,7 +24,12 @@ include(base/base.pri)
 INCLUDEPATH +=$$PWD music
 include(music/music.pri)
 
+INCLUDEPATH +=$$PWD translations
+
 RESOURCES += \
     res_music.qrc \
-    res_main.qrc
+    res_main.qrc \
+    i18n.qrc
 
+TRANSLATIONS += translations/i18n_en.ts \
+                translations/i18n_zh.ts

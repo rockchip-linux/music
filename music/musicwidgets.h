@@ -5,7 +5,6 @@
 #include "bottom/bottomwidgets.h"
 #include "top/topwidgets.h"
 #include "middle/middlewidgets.h"
-
 #include "player/musicplayer.h"
 
 /**
@@ -15,16 +14,16 @@
  * The layout include top、middle(left、right)、bottom widgets and each has their own
  * layout control and logic processing.
  */
-class MusicWidgets:public BaseWidget
+class MusicWidgets : public BaseWidget
 {
     Q_OBJECT
 public:
-    MusicWidgets(QWidget *parent=0);
+    MusicWidgets(QWidget *parent = 0);
     ~MusicWidgets();
 
-    // Update ui by search result.
     void updateUiByRes(QFileInfoList);
     void updateVolume(bool volumeAdd);
+
 private:
     MusicPlayer *m_player;
 
@@ -39,6 +38,7 @@ private:
     void setOriginState();
     void savaSetting();
     void saveVolume(int volume);
+
 private slots: 
     void slot_volumeChanged(int);
     void slot_nextSong();
@@ -48,21 +48,20 @@ private slots:
     void slot_playOrPause();
     void slot_changePlayMode();
     void slot_refreshMediaResource();
-    // MediaPlayer...
+
     void slot_onMediaStatusChanged(MusicPlayer::MediaStatus);
     void slot_onErrorOn(MusicPlayer::Error);
     void slot_onStateChanged(MusicPlayer::State);
     void slot_onPositonChanged(qint64);
     void slot_onDuratuonChanged(qint64);
 
-    void slot_onTableItemClicked(int,int);
+    void slot_onTableItemClicked(int, int);
     void slot_deleteTableItem(int);
     void slot_changePlayerProgress(int);
     void slot_exit();
+
 public slots:
     void slot_onMetaDataAvailable();
-protected:
-
 };
 
 #endif // MUSICWIDGETS_H
