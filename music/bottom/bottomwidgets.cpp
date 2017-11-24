@@ -94,7 +94,7 @@ void BottomWidgets::initLayout()
     layout->addLayout(mainLayout);
     layout->setMargin(0);
     layout->setSpacing(0);
-
+    layout->setContentsMargins(15,15,15,0);
     setLayout(layout);
 }
 
