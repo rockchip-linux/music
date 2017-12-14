@@ -33,22 +33,14 @@ void MusicWidgets::readSetting()
     m_bottomwid->updatePlayModeIcon(PlayMode(playModeIndex));
     m_player->currentPlayModeChanged(PlayMode(playModeIndex));
 
-    setting.endGroup();
-
     // set volume which saved in configration file.
-    QFile *volumnFile;
-    QDir settingsDir("/data/");
-    if (settingsDir.exists())
-        volumnFile = new QFile("/data/volumn");
-    else
-        volumnFile = new QFile("/etc/volumn");
+    int volumeInt = 0;
+    volumeInt = setting.value("volume").toInt();
 
-    volumnFile->open(QFile::ReadOnly | QIODevice::Truncate);
-    QString volumnString(volumnFile->readAll());
-    long volumnInt = volumnString.toInt();
+    m_player->setVolume(volumeInt);
+    m_bottomwid->updateVolumeSliderValue(volumeInt);
 
-    m_player->setVolume(volumnInt);
-    m_bottomwid->updateVolumeSliderValue(volumnInt);
+    setting.endGroup();
 }
 
 void MusicWidgets::initData()
@@ -76,9 +68,12 @@ void MusicWidgets::initLayout()
 
 void MusicWidgets::initPlayerAndConnection()
 {
-    connect(m_player, SIGNAL(mediaStatusChanged(MusicPlayer::MediaStatus)), this, SLOT(slot_onMediaStatusChanged(MusicPlayer::MediaStatus)));
-    connect(m_player, SIGNAL(error(MusicPlayer::Error)), this, SLOT(slot_onErrorOn(MusicPlayer::Error)));
-    connect(m_player, SIGNAL(stateChanged(MusicPlayer::State)), this, SLOT(slot_onStateChanged(MusicPlayer::State)));
+    connect(m_player, SIGNAL(mediaStatusChanged(MusicPlayer::MediaStatus)),
+            this, SLOT(slot_onMediaStatusChanged(MusicPlayer::MediaStatus)));
+    connect(m_player, SIGNAL(error(MusicPlayer::Error)),
+            this, SLOT(slot_onErrorOn(MusicPlayer::Error)));
+    connect(m_player, SIGNAL(stateChanged(MusicPlayer::State)),
+            this, SLOT(slot_onStateChanged(MusicPlayer::State)));
     connect(m_player, SIGNAL(metaDataAvailable()), this, SLOT(slot_onMetaDataAvailable()));
     connect(m_player, SIGNAL(positionChanged(qint64)), this, SLOT(slot_onPositonChanged(qint64)));
     connect(m_player, SIGNAL(durationChanged(qint64)), this, SLOT(slot_onDuratuonChanged(qint64)));
@@ -90,19 +85,21 @@ void MusicWidgets::initPlayerAndConnection()
     connect(m_bottomwid, SIGNAL(nextLongPressed()), this, SLOT(slot_fastForward()));
     connect(m_bottomwid, SIGNAL(lastLongPressed()), this, SLOT(slot_fastBackward()));
     connect(m_bottomwid, SIGNAL(playPauseClick()), this, SLOT(slot_playOrPause()));
-    connect(m_bottomwid, SIGNAL(progressSliderPositionChanged(int)), this, SLOT(slot_changePlayerProgress(int)));
+    connect(m_bottomwid, SIGNAL(progressSliderPositionChanged(int)),
+            this, SLOT(slot_changePlayerProgress(int)));
     connect(m_bottomwid, SIGNAL(volumeChanged(int)), this, SLOT(slot_volumeChanged(int)));
     connect(m_bottomwid, SIGNAL(playModeClick()), this, SLOT(slot_changePlayMode()));
     connect(m_bottomwid, SIGNAL(refreshClick()), this, SLOT(slot_refreshMediaResource()));
 
-    connect(m_middlewid->getListWidget(), SIGNAL(tableClick(int,int)), this, SLOT(slot_onTableItemClicked(int,int)));
-    connect(m_middlewid->getListWidget(), SIGNAL(tableLongPressed(int)), this, SLOT(slot_deleteTableItem(int)));
+    connect(m_middlewid->getListWidget(), SIGNAL(tableClick(int,int)),
+            this, SLOT(slot_onTableItemClicked(int,int)));
+    connect(m_middlewid->getListWidget(), SIGNAL(tableLongPressed(int)),
+            this, SLOT(slot_deleteTableItem(int)));
 }
 
 void MusicWidgets::slot_volumeChanged(int value)
 {
     m_player->setVolume(value);
-    saveVolume(value);
 }
 
 void MusicWidgets::slot_onErrorOn(MusicPlayer::Error)
@@ -270,17 +267,18 @@ void MusicWidgets::updateUiByRes(QFileInfoList fileInfoList)
 
 void MusicWidgets::savaSetting()
 {
-    // saved play mode when exit application.
+    // saved play mode and volume when exit application.
     QSettings setting("config.ini", QSettings::IniFormat, 0);
     setting.beginGroup("musicConfig");
     setting.setValue("playmode", (int)m_middlewid->getListWidget()->getMediaList()->getPlayMode());
+    setting.setValue("volume", m_player->volume());
     setting.endGroup();
 }
 
 void MusicWidgets::slot_exit()
 {
-    m_player->clientExit();
     savaSetting();
+    m_player->clientExit();
     mainWindow->exitApplication();
 }
 
@@ -299,23 +297,6 @@ void MusicWidgets::updateVolume(bool volumeAdd)
             m_player->setVolume(0);
     }
     m_bottomwid->updateVolumeSliderValue(m_player->volume());
-}
-
-void MusicWidgets::saveVolume(int volume)
-{
-    QDir settingsDir("/data/");
-    QFile *volumeFile;
-
-    if (settingsDir.exists())
-        volumeFile = new QFile("/data/volumn");
-    else
-        volumeFile = new QFile("/etc/volumn");
-
-    if (volumeFile->open(QFile::WriteOnly | QIODevice::Truncate)) {
-        QTextStream out(volumeFile);
-        out << volume;
-        volumeFile->close();
-    }
 }
 
 MusicWidgets::~MusicWidgets()
