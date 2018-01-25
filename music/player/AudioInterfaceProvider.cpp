@@ -54,7 +54,7 @@ bool AudioInterfaceProvider::sendMessageForResult(long int msgType, control_mess
                 return true;
             }
         } else {
-            printf("for result with error: %s\n", strerror(errno));
+            printf("for result with msg_type: %ld, error: %s\n", msgType, strerror(errno));
             m_mtx.unlock();
             return false;
         }

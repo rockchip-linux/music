@@ -17,7 +17,7 @@ public:
     explicit BottomWidgets(QWidget *parent = 0);
     ~BottomWidgets(){}
 
-    void onPlayerPositionChanged(qint64, qint64);
+    void onPlayerPositionChanged(qint64);
     void onPlayerDurationChanged(qint64);
     void setPauseStyle();
     void setPlayStyle();
@@ -26,6 +26,7 @@ public:
     void updatePlayModeIcon(PlayMode);
 
 private:
+    qint64 m_duration;
     BaseSlider *m_progressSlider;
 
     QLabel *m_labPosition;

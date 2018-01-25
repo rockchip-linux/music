@@ -150,7 +150,7 @@ void MusicWidgets::slot_onMetaDataAvailable()
 
 void MusicWidgets::slot_onPositonChanged(qint64 position)
 {
-    m_bottomwid->onPlayerPositionChanged(position, m_player->duration());
+    m_bottomwid->onPlayerPositionChanged(position);
     m_middlewid->getLyricWidget()->onCurrentPositionChanged(position);
 }
 

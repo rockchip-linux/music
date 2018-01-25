@@ -20,6 +20,7 @@ int progress_slider_height = 10;
 #endif
 
 BottomWidgets::BottomWidgets(QWidget *parent) : BaseWidget(parent)
+  , m_duration(-1)
 {
     setBackgroundColor(54, 54, 54);
 
@@ -136,20 +137,19 @@ void BottomWidgets::updateVolumeSliderValue(int value)
 
 void BottomWidgets::onPlayerDurationChanged(qint64 duration)
 {
+    m_duration = duration;
     m_progressSlider->setRange(0, duration);
 }
 
-void BottomWidgets::onPlayerPositionChanged(qint64 position, qint64 duration)
+void BottomWidgets::onPlayerPositionChanged(qint64 position)
 {
     QTime currentTime((position % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
                       (position % (1000 * 60 * 60)) / (1000 * 60),
                       (position % (1000 * 60)) / 1000);
-    QTime totalTime((duration % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
-                    (duration % (1000 * 60 * 60)) / (1000 * 60),
-                    (duration % (1000 * 60)) / 1000);
+    QTime totalTime((m_duration % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
+                    (m_duration % (1000 * 60 * 60)) / (1000 * 60),
+                    (m_duration % (1000 * 60)) / 1000);
     setPositionLabel(currentTime, totalTime);
-
-    m_progressSlider->setRange(0, duration);
     m_progressSlider->setValue(position);
 }
 
