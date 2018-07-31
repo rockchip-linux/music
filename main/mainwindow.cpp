@@ -11,6 +11,7 @@ const QString MUSIC_SEARCH_PATH_UDISK = QStandardPaths::writableLocation(QStanda
 const QString MUSIC_SEARCH_PATH_USERDATA = QStandardPaths::writableLocation(QStandardPaths::HomeLocation).append("/userdata");
 const QString MUSIC_SEARCH_PATH_OEM = QStandardPaths::writableLocation(QStandardPaths::HomeLocation).append("/oem");
 const QString MUSIC_SEARCH_PATH_MEDIA = QStandardPaths::writableLocation(QStandardPaths::HomeLocation).append("/media");
+const QString MUSIC_SEARCH_PATH_MNT = QStandardPaths::writableLocation(QStandardPaths::HomeLocation).append("/mnt");
 
 MainWindow::MainWindow(QWidget *parent) : BaseWindow(parent)
   , mediaHasUpdate(false)
@@ -192,6 +193,7 @@ void MediaUpdateThread::run()
     musicFileList.append(findMusicFiles(MUSIC_SEARCH_PATH_USERDATA));
     musicFileList.append(findMusicFiles(MUSIC_SEARCH_PATH_OEM));
     musicFileList.append(findMusicFiles(MUSIC_SEARCH_PATH_MEDIA));
+    musicFileList.append(findMusicFiles(MUSIC_SEARCH_PATH_MNT));
     if (!isInterruptionRequested())
         emit m_parent->searchResultAvailable(musicFileList);
 }
