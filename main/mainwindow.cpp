@@ -10,6 +10,8 @@ const QString MUSIC_SEARCH_PATH_USERDATA = QStandardPaths::writableLocation(QSta
 const QString MUSIC_SEARCH_PATH_OEM = QStandardPaths::writableLocation(QStandardPaths::HomeLocation).append("/oem");
 const QString MUSIC_SEARCH_PATH_MEDIA = QStandardPaths::writableLocation(QStandardPaths::HomeLocation).append("/media");
 const QString MUSIC_SEARCH_PATH_MNT = QStandardPaths::writableLocation(QStandardPaths::HomeLocation).append("/mnt");
+const QString MUSIC_SEARCH_PATH_TMP = QStandardPaths::writableLocation(QStandardPaths::HomeLocation).append("/tmp");
+
 
 MainWindow::MainWindow(QWidget *parent) : BaseWindow(parent)
   , mediaHasUpdate(false)
@@ -190,6 +192,7 @@ void MediaUpdateThread::run()
     musicFileList.append(findMusicFiles(MUSIC_SEARCH_PATH_OEM));
     musicFileList.append(findMusicFiles(MUSIC_SEARCH_PATH_MEDIA));
     musicFileList.append(findMusicFiles(MUSIC_SEARCH_PATH_MNT));
+    musicFileList.append(findMusicFiles(MUSIC_SEARCH_PATH_TMP));
     if (!isInterruptionRequested())
         emit m_parent->searchResultAvailable(musicFileList);
 }
