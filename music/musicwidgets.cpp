@@ -193,6 +193,8 @@ void MusicWidgets::slot_onTableItemClicked(int row, int)
 void MusicWidgets::slot_deleteTableItem(int row)
 {
     QMessageBox box(QMessageBox::Warning, tr("question"), tr("sure you want to remove the record ?"));
+    box.setParent(this);
+    box.setWindowFlags(Qt::FramelessWindowHint | Qt::Popup);
     box.setStandardButtons (QMessageBox::Yes | QMessageBox::Cancel);
     if (box.exec() == QMessageBox::Yes) {
         MediaList *playlist = m_middlewid->getListWidget()->getMediaList();
