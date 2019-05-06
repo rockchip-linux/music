@@ -97,7 +97,6 @@ void MainWindow::disableApplication()
 
 void MainWindow::enableApplication()
 {
-    qDebug("enable music application");
     this->setVisible(true);
 }
 
