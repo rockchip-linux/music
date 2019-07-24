@@ -1,4 +1,2 @@
-*.user
-*.user.*
+music.pro.user
 Makefile
-pkg-config_wrapper.sh
